@@ -14,9 +14,6 @@ learning.
 - [Writing Haskell in Kotlin](#writing-haskell-in-kotlin)
   - [Table of contents](#table-of-contents)
   - [What will be used](#what-will-be-used)
-  - [Getting started](#getting-started)
-    - [Yeoman](#yeoman)
-    - [IntelliJ](#intellij)
   - [Parsing](#parsing)
     - [Abstract Syntax Tree](#abstract-syntax-tree)
     - [ANTLR](#antlr)
@@ -48,21 +45,6 @@ learning.
 ## Getting started
 
 You will need to bootstrap the gradle project.
-
-### Yeoman
-
-You can bootstrap the gradle project using [yeoman](https://yeoman.io/)
-and [gradle-kotlin plugin](https://github.com/jcdenton/generator-gradle-kotlin).
-
-```bash
-yo gradle-kotlin
-```
-
-### IntelliJ
-
-You can use the default project wizard to create a new project.
-
-<img src="assets/intellij-wizard.png" alt="IntelliJ Project Wizard">
 
 ## Parsing
 
