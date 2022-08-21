@@ -9,36 +9,36 @@ type systems. You can read more [here](#see-also).
 This is not production-ready and not scientific material, but it is a good starting point for
 learning.
 
-### Table of contents
+## Table of contents
 
 - [Writing Haskell in Kotlin](#writing-haskell-in-kotlin)
-    - [Table of contents](#table-of-contents)
-    - [What will be used](#what-will-be-used)
-    - [Getting started](#getting-started)
-      - [Yeoman](#yeoman)
-      - [IntelliJ](#intellij)
-    - [Parsing](#parsing)
-      - [Abstract Syntax Tree](#abstract-syntax-tree)
-      - [ANTLR](#antlr)
-      - [Mapping](#mapping)
-      - [Pretty printing](#pretty-printing)
-    - [Resolving](#resolving)
-      - [Resolving names](#resolving-names)
-      - [Resolving imports](#resolving-imports)
-      - [Validating](#validating)
-      - [Resolved Tree](#resolved-tree)
-    - [Type System](#type-system)
-      - [Parametric Polymorphism](#parametric-polymorphism)
-      - [Algorithm W](#algorithm-w)
-      - [Mutable substitutions](#mutable-substitutions)
-      - [Mutable references](#mutable-references)
-      - [Typed tree](#typed-tree)
-      - [Type classes](#type-classes)
-    - [Evaluating](#evaluating)
-    - [See also](#see-also)
-    - [Bibliography](#bibliography)
+  - [Table of contents](#table-of-contents)
+  - [What will be used](#what-will-be-used)
+  - [Getting started](#getting-started)
+    - [Yeoman](#yeoman)
+    - [IntelliJ](#intellij)
+  - [Parsing](#parsing)
+    - [Abstract Syntax Tree](#abstract-syntax-tree)
+    - [ANTLR](#antlr)
+    - [Mapping](#mapping)
+    - [Pretty printing](#pretty-printing)
+  - [Resolving](#resolving)
+    - [Resolving names](#resolving-names)
+    - [Resolving imports](#resolving-imports)
+    - [Validating](#validating)
+    - [Resolved Tree](#resolved-tree)
+  - [Type System](#type-system)
+    - [Parametric Polymorphism](#parametric-polymorphism)
+    - [Algorithm W](#algorithm-w)
+    - [Mutable substitutions](#mutable-substitutions)
+    - [Mutable references](#mutable-references)
+    - [Typed tree](#typed-tree)
+    - [Type classes](#type-classes)
+  - [Evaluating](#evaluating)
+  - [See also](#see-also)
+  - [Bibliography](#bibliography)
 
-### What will be used
+## What will be used
 
 * A Text Editor ([Visual Studio Code](https://code.visualstudio.com/), [IntelliJ](https://www.jetbrains.com/idea/),
   etc...)
@@ -46,11 +46,11 @@ learning.
 * [Kotlin 1.7.10+](https://kotlinlang.org/)
 * [Gradle 7.3.3+](https://gradle.org/)
 
-### Getting started
+## Getting started
 
 You will need to bootstrap the gradle project.
 
-#### Yeoman
+### Yeoman
 
 You can bootstrap the gradle project using [yeoman](https://yeoman.io/)
 and [gradle-kotlin plugin](https://github.com/jcdenton/generator-gradle-kotlin).
@@ -59,15 +59,15 @@ and [gradle-kotlin plugin](https://github.com/jcdenton/generator-gradle-kotlin).
 yo gradle-kotlin
 ```
 
-#### IntelliJ
+### IntelliJ
 
 You can use the default project wizard to create a new project.
 
 <img src="assets/intellij-wizard.png" alt="IntelliJ Project Wizard">
 
-### Parsing
+## Parsing
 
-#### Abstract Syntax Tree
+### Abstract Syntax Tree
 
 The Abstract Syntax Tree(AST) is a tree representation of the Syntax using data types.
 
@@ -122,23 +122,23 @@ sealed interface Pat
 data class PVar(val id: Ident) : Pat
 ```
 
-#### ANTLR
+### ANTLR
 
-#### Mapping
+### Mapping
 
-#### Pretty printing
+### Pretty printing
 
-### Resolving
+## Resolving
 
-#### Resolving names
+### Resolving names
 
-#### Resolving imports
+### Resolving imports
 
-#### Validating
+### Validating
 
-#### Resolved Tree
+### Resolved Tree
 
-### Type System
+## Type System
 
 The type system that we will use is
 the [Hindley Milner](https://en.wikipedia.org/wiki/Hindley%E2%80%93Milner_type_system)(also known as Damas-Milner or
@@ -146,23 +146,23 @@ Damas-Hindley-Milner).
 We will also need an inference algorithm,
 the [Algorithm W](https://en.wikipedia.org/wiki/Hindley%E2%80%93Milner_type_system#Algorithm_W)
 
-#### Parametric Polymorphism
+### Parametric Polymorphism
 
-#### Algorithm W
+### Algorithm W
 
-#### Mutable substitutions
+### Mutable substitutions
 
-#### Mutable references
+### Mutable references
 
-#### Typed tree
+### Typed tree
 
-#### Type classes
+### Type classes
 
-### Evaluating
+## Evaluating
 
-### See also
+## See also
 
-### Bibliography
+## Bibliography
 
 * https://smunix.github.io/dev.stephendiehl.com/fun/index.html
 * http://web.cecs.pdx.edu/~mpj/thih/thih.pdf
