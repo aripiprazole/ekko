@@ -101,7 +101,7 @@ data class Ident(val name: String, val displayName: String = name) {
 data class Alt(val id: Ident, val patterns: List<Pat>, val exp: Exp)
 ```
 
-So, `Pat` are representations of patterns, that in this moment, will not be taken in-deep, to maintain the simplicity. But currently have a representation of name identifiers.
+So, `Pat` are representations of patterns, that at this moment, will not be taken in-deep, to maintain the simplicity. But currently have a representation of name identifiers.
 
 ```kotlin
 // Pat.kt
