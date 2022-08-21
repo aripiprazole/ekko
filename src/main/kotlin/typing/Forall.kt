@@ -7,6 +7,10 @@ data class Forall(val names: Set<String>, val typ: Typ) {
   }
 }
 
+fun Forall.apply(subst: Subst): Forall {
+  return Forall(names, typ.apply(subst))
+}
+
 fun Forall.ftv(): Set<String> {
   return typ.ftv().filter { it !in names }.toSet()
 }

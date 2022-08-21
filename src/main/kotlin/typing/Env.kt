@@ -11,3 +11,7 @@ fun Env.ftv(): Set<String> = values.flatMap { it.ftv() }.toSet()
 fun Env.extendEnv(vararg pairs: Pair<String, Forall>): Env {
   return this + envOf(pairs = pairs)
 }
+
+fun Env.apply(subst: Subst): Env {
+  return mapValues { it.value.apply(subst) }
+}
