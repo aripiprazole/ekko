@@ -11,9 +11,9 @@ DECIMAL: INT '.' INT;
 LPAREN: '(';
 RPAREN: ')';
 
-exp: IDENT             # EVar
-   | STRING            # EStr
-   | INT               # EInt
-   | DECIMAL           # EDecimal
-   | LPAREN exp RPAREN # EGroup
-   | exp exp           # EApp;
+exp: value=IDENT             # EVar
+   | value=STRING            # EStr
+   | value=INT               # EInt
+   | value=DECIMAL           # EDecimal
+   | LPAREN value=exp RPAREN # EGroup
+   | lhs=exp rhs=exp         # EApp;

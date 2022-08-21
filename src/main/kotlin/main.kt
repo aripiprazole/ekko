@@ -3,6 +3,7 @@ package ekko
 import ekko.parser.EkkoLexer
 import ekko.parser.EkkoParser
 import ekko.parser.toParseTree
+import ekko.parser.treeToExp
 import org.antlr.v4.kotlinruntime.CharStreams
 import org.antlr.v4.kotlinruntime.CommonTokenStream
 import org.antlr.v4.kotlinruntime.DiagnosticErrorListener
@@ -21,5 +22,6 @@ fun main() {
 
   val exp = parser.exp()
 
+  println(exp.treeToExp())
   println(exp.toParseTree().multilineString())
 }
