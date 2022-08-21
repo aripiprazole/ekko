@@ -1,7 +1,5 @@
 import com.strumenta.antlrkotlin.gradleplugin.AntlrKotlinTask
-import java.io.FilterReader
-import java.io.Reader
-import java.io.StringReader
+import ekko.gradle.KtSuppressFilterReader
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 buildscript {
@@ -16,9 +14,9 @@ buildscript {
 }
 
 plugins {
-  kotlin("jvm") version "1.7.10"
-  id("org.jlleitschuh.gradle.ktlint") version "10.2.1"
-  id("io.gitlab.arturbosch.detekt") version "1.19.0"
+  kotlin("jvm")
+  id("org.jlleitschuh.gradle.ktlint")
+  id("io.gitlab.arturbosch.detekt")
 }
 
 group = "me.devgabi"
@@ -90,48 +88,4 @@ val generateAntlrSource by tasks.creating(Copy::class) {
   include("**/*.kt")
   filter<KtSuppressFilterReader>()
   into(rootProject.file("src/generated/kotlin"))
-}
-
-class KtSuppressFilterReader(reader: Reader) : FilterReader(StringReader(SUPPRESS_ANNOT_HEADER + reader.readText())) {
-  companion object {
-    private val SUPPRESS_ANNOT_HEADER = arrayOf(
-      "UNNECESSARY_NOT_NULL_ASSERTION",
-      "UNUSED_PARAMETER",
-      "USELESS_CAST",
-      "UNUSED_VALUE",
-      "VARIABLE_WITH_REDUNDANT_INITIALIZER",
-      "PARAMETER_NAME_CHANGED_ON_OVERRIDE",
-      "SENSELESS_COMPARISON",
-      "UNCHECKED_CAST",
-      "UNUSED",
-      "RemoveRedundantQualifierName",
-      "RedundantCompanionReference",
-      "RedundantVisibilityModifier",
-      "FunctionName",
-      "SpellCheckingInspection",
-      "RedundantExplicitType",
-      "ConvertSecondaryConstructorToPrimary",
-      "ConstantConditionIf",
-      "CanBeVal",
-      "LocalVariableName",
-      "RemoveEmptySecondaryConstructorBody",
-      "LiftReturnOrAssignment",
-      "MemberVisibilityCanBePrivate",
-      "RedundantNullableReturnType",
-      "OverridingDeprecatedMember",
-      "EnumEntryName",
-      "RemoveExplicitTypeArguments",
-      "PrivatePropertyName",
-      "ProtectedInFinal",
-      "MoveLambdaOutsideParentheses",
-      "UnnecessaryImport",
-      "KotlinRedundantDiagnosticSuppress",
-      "ClassName",
-      "CanBeParameter",
-      "Detekt.MaximumLineLength",
-      "Detekt.MaxLineLength",
-      "Detekt.FinalNewline",
-      "ktlint",
-    ).joinToString(separator = ", ", prefix = "@file:Suppress(", postfix = ")\n\n") { "\"$it\"" }
-  }
 }
