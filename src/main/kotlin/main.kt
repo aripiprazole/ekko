@@ -11,7 +11,9 @@ import org.antlr.v4.kotlinruntime.DiagnosticErrorListener
 fun main() {
   val stream = CharStreams.fromString(
     """
-    println "hello, world!"
+    let x = 1,
+        y = 2
+    in sum x y
     """.trimIndent(),
   )
 
@@ -23,5 +25,5 @@ fun main() {
   val exp = parser.exp()
 
   println(exp.treeToExp())
-  println(exp.toParseTree().multilineString())
+//  println(exp.toParseTree().multilineString())
 }

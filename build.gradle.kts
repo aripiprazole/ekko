@@ -52,14 +52,6 @@ dependencies {
   implementation("com.strumenta.antlr-kotlin:antlr-kotlin-runtime-jvm:160bc0b70f")
 }
 
-tasks.test {
-  useJUnitPlatform()
-}
-
-tasks.withType<KotlinCompile> {
-  kotlinOptions.jvmTarget = "1.8"
-}
-
 val generateMainAntlrSource by tasks.creating(AntlrKotlinTask::class) {
   val dependencies = project.dependencies
 
@@ -88,4 +80,13 @@ val generateAntlrSource by tasks.creating(Copy::class) {
   include("**/*.kt")
   filter<KtSuppressFilterReader>()
   into(rootProject.file("src/generated/kotlin"))
+}
+
+tasks.test {
+  useJUnitPlatform()
+}
+
+tasks.withType<KotlinCompile> {
+  dependsOn(generateAntlrSource)
+  kotlinOptions.jvmTarget = "1.8"
 }
