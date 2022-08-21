@@ -2,12 +2,14 @@ package ekko.parser
 
 import ekko.parser.EkkoParser.EAppContext
 import ekko.parser.EkkoParser.EDecimalContext
+import ekko.parser.EkkoParser.EGroupContext
 import ekko.parser.EkkoParser.EIntContext
 import ekko.parser.EkkoParser.ELetContext
 import ekko.parser.EkkoParser.EStrContext
 import ekko.parser.EkkoParser.EVarContext
 import ekko.parser.EkkoParser.ExpContext
 import ekko.tree.EApp
+import ekko.tree.EGroup
 import ekko.tree.ELet
 import ekko.tree.ELit
 import ekko.tree.EVar
@@ -38,6 +40,12 @@ fun ExpContext.treeToExp(): Exp {
       val ident = value!!.treeToIdent()
 
       EVar(ident)
+    }
+
+    is EGroupContext -> {
+      val value = value!!.treeToExp()
+
+      EGroup(value)
     }
 
     is EStrContext -> {
