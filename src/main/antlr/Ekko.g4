@@ -1,7 +1,19 @@
 grammar Ekko;
 
-ID: [a-zA-Z_][a-zA-Z0-9_]*;
+NEWLINE: ([\r\n] | [\n])+;
+WS: (' ' | '\t' | NEWLINE)+ -> channel(HIDDEN);
 
-PRINTLN: 'println';
+IDENT: ['a-zA-Z_]['a-zA-Z0-9_]*;
+STRING: '"' (~["\r\n\\] | '\\' ~[\r\n])* '"';
+INT: [0-9]+ ;
+DECIMAL: INT '.' INT;
 
-exp: PRINTLN ID;
+LPAREN: '(';
+RPAREN: ')';
+
+exp: IDENT             # EVar
+   | STRING            # EStr
+   | INT               # EInt
+   | DECIMAL           # EDecimal
+   | LPAREN exp RPAREN # EGroup
+   | exp exp           # EApp;
