@@ -1,5 +1,6 @@
 package ekko.parser
 
+import ekko.parser.EkkoParser.EAbsContext
 import ekko.parser.EkkoParser.EAppContext
 import ekko.parser.EkkoParser.EDecimalContext
 import ekko.parser.EkkoParser.EGroupContext
@@ -8,6 +9,7 @@ import ekko.parser.EkkoParser.ELetContext
 import ekko.parser.EkkoParser.EStrContext
 import ekko.parser.EkkoParser.EVarContext
 import ekko.parser.EkkoParser.ExpContext
+import ekko.tree.EAbs
 import ekko.tree.EApp
 import ekko.tree.EGroup
 import ekko.tree.ELet
@@ -62,6 +64,13 @@ fun ExpContext.treeToExp(): Exp {
       val int = value!!.text!!.toInt()
 
       ELit(LInt(int))
+    }
+
+    is EAbsContext -> {
+      val param = param!!.treeToPat()
+      val value = value!!.treeToExp()
+
+      EAbs(param, value)
     }
 
     else -> throw IllegalArgumentException("Unsupported expression: ${this::class}")

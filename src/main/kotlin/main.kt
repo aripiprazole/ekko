@@ -12,7 +12,7 @@ import org.antlr.v4.kotlinruntime.CommonTokenStream
 import org.antlr.v4.kotlinruntime.DiagnosticErrorListener
 
 fun main() {
-  val stream = CharStreams.fromString("""let f x = x, a = f id in a 1""")
+  val stream = CharStreams.fromString("""let f x = x, a = f id in a (\x -> x)""")
 
   val lexer = EkkoLexer(stream)
   val parser = EkkoParser(CommonTokenStream(lexer)).apply {

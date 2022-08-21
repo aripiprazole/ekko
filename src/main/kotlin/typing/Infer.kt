@@ -1,6 +1,7 @@
 package ekko.typing
 
 import ekko.tree.Alt
+import ekko.tree.EAbs
 import ekko.tree.EApp
 import ekko.tree.EGroup
 import ekko.tree.ELet
@@ -37,6 +38,13 @@ class Infer {
         val s3 = mgu(t1, t2 arrow tv)
 
         (s3 compose s2 compose s1) to (tv apply s3)
+      }
+
+      is EAbs -> {
+        val (tv, newEnv) = synthPat(exp.param, env)
+        val (subst, typ) = synthExp(exp.value, newEnv)
+
+        subst to ((tv arrow typ) apply subst)
       }
 
       is ELet -> {

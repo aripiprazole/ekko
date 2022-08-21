@@ -10,6 +10,8 @@ LPAREN: '(';
 RPAREN: ')';
 EQ: '=';
 COLON: ',';
+BAR: '\\';
+ARROW: '->';
 
 IDENT: ['a-zA-Z_]['a-zA-Z0-9_]*;
 STRING: '"' (~["\r\n\\] | '\\' ~[\r\n])* '"';
@@ -21,6 +23,7 @@ pat: name=IDENT # PVar;
 alt: name=IDENT pat* EQ value=exp;
 
 exp: LET alt (COLON alt)* IN value=exp # ELet
+   | BAR param=pat ARROW value=exp     # EAbs
    | value=IDENT                       # EVar
    | value=STRING                      # EStr
    | value=INT                         # EInt
