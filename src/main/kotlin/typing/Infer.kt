@@ -19,10 +19,10 @@ import ekko.tree.Pat
 class Infer {
   private var state: Int = 0
 
-  fun synthExp(exp: Exp, env: Env = emptyEnv()): Pair<Subst, Typ> {
+  fun tiExp(exp: Exp, env: Env = emptyEnv()): Pair<Subst, Typ> {
     return when (exp) {
-      is EGroup -> synthExp(exp.value)
-      is ELit -> emptySubst() to synthLit(exp.lit)
+      is EGroup -> tiExp(exp.value)
+      is ELit -> emptySubst() to tiLit(exp.lit)
 
       is EVar -> {
         val scheme = env[exp.id.name] ?: throw InferException("unbound variable: ${exp.id}")
@@ -32,8 +32,8 @@ class Infer {
 
       is EApp -> {
         val tv = fresh()
-        val (s1, t1) = synthExp(exp.lhs, env)
-        val (s2, t2) = synthExp(exp.rhs, env.apply(s1))
+        val (s1, t1) = tiExp(exp.lhs, env)
+        val (s2, t2) = tiExp(exp.rhs, env.apply(s1))
 
         val s3 = mgu(t1, t2 arrow tv)
 
@@ -41,8 +41,8 @@ class Infer {
       }
 
       is EAbs -> {
-        val (tv, newEnv) = synthPat(exp.param, env)
-        val (subst, typ) = synthExp(exp.value, newEnv)
+        val (tv, newEnv) = tiPat(exp.param, env)
+        val (subst, typ) = tiExp(exp.value, newEnv)
 
         subst to ((tv arrow typ) apply subst)
       }
@@ -52,38 +52,38 @@ class Infer {
         var newEnv = env.toMap()
 
         for (alt in exp.bindings.values) {
-          val (subst, typ) = synthAlt(alt, newEnv)
+          val (subst, typ) = tiAlt(alt, newEnv)
 
           newSubst = newSubst compose subst
           newEnv = newEnv.extendEnv(alt.id.name to generalize(typ, newEnv))
         }
 
-        val (subst, typ) = synthExp(exp.value, newEnv)
+        val (subst, typ) = tiExp(exp.value, newEnv)
 
         (subst compose newSubst) to typ
       }
     }
   }
 
-  fun synthAlt(alt: Alt, env: Env): Pair<Subst, Typ> {
+  fun tiAlt(alt: Alt, env: Env): Pair<Subst, Typ> {
     val parameters = mutableListOf<Typ>()
     val newEnv = env.toMutableMap()
 
     for (pat in alt.patterns) {
-      val (typ, currentEnv) = synthPat(pat, newEnv)
+      val (typ, currentEnv) = tiPat(pat, newEnv)
 
       parameters += typ
       newEnv += currentEnv
     }
 
-    val (subst, typ) = synthExp(alt.exp, newEnv)
+    val (subst, typ) = tiExp(alt.exp, newEnv)
 
     return subst to parameters.fold(typ) { acc, next ->
       next arrow acc
     }
   }
 
-  fun synthPat(pat: Pat, env: Env): Pair<Typ, Env> {
+  fun tiPat(pat: Pat, env: Env): Pair<Typ, Env> {
     return when (pat) {
       is PVar -> {
         val typ = fresh()
@@ -93,7 +93,7 @@ class Infer {
     }
   }
 
-  fun synthLit(lit: Lit): Typ {
+  fun tiLit(lit: Lit): Typ {
     return when (lit) {
       is LInt -> Typ.Int
       is LFloat -> Typ.Float

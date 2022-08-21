@@ -26,5 +26,5 @@ fun main() {
     put("id", Forall(setOf("a"), Typ.variable("a") arrow Typ.variable("a")))
   }
 
-  println(infer.synthExp(exp.treeToExp(), env))
+  println(infer.tiExp(exp.treeToExp(), env))
 }
