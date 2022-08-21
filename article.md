@@ -11,12 +11,31 @@ learning.
 
 ### Table of contents
 
-- [What will be used](#what-will-be-used)
-- [Getting started](#getting-started)
-  * [Yeoman](#yeoman)
-  * [IntelliJ](#intellij)
-- [See also](#see-also)
-- [Bibliography](#bibliography)
+- [Writing Haskell in Kotlin](#writing-haskell-in-kotlin)
+  - [Table of contents](#table-of-contents)
+  - [What will be used](#what-will-be-used)
+  - [Getting started](#getting-started)
+    - [Yeoman](#yeoman)
+    - [IntelliJ](#intellij)
+  - [Parsing](#parsing)
+    - [Abstract Syntax Tree](#abstract-syntax-tree)
+    - [ANTLR](#antlr)
+    - [Mapping](#mapping-ast)
+    - [Pretty printing](#pretty-printing)
+  - [Resolving](#resolving)
+    - [Resolving names](#resolving-names)
+    - [Resolving imports](#resolving-imports)
+    - [Validating](#validating)
+    - [Resolved tree](#resolved-tree)
+  - [Type System](#type-system)
+    - [Algorithm W](#algorithm-w)
+    - [Mutable substitutions](#mutable-substs)
+    - [Mutable references](#mutable-references)
+    - [Typed tree](#typed-tree)
+    - [Type classes](#type-classes)
+  - [Evaluating](#eval)
+  - [See also](#see-also)
+  - [Bibliography](#bibliography)
 
 ### What will be used
 
@@ -27,19 +46,88 @@ learning.
 * [Gradle 7.3.3+](https://gradle.org/)
 
 ### Getting started
+
 You will need to bootstrap the gradle project.
 
 #### Yeoman
-You can bootstrap the gradle project using [yeoman](https://yeoman.io/) and [gradle-kotlin plugin](https://github.com/jcdenton/generator-gradle-kotlin).
+
+You can bootstrap the gradle project using [yeoman](https://yeoman.io/)
+and [gradle-kotlin plugin](https://github.com/jcdenton/generator-gradle-kotlin).
 
 ```bash
 yo gradle-kotlin
 ```
 
 #### IntelliJ
+
 You can use the default project wizard to create a new project.
 
-<img src="assets/intellij-wizard.png">
+<img src="assets/intellij-wizard.png" alt="IntelliJ Project Wizard">
+
+### Parsing
+
+#### Abstract Syntax Tree
+
+The Abstract Syntax Tree(AST) is a tree representation of the Syntax using data types.
+
+The initial AST of Ekko project is:
+
+> Exp.kt
+```kotlin
+sealed interface Exp
+
+data class ELit(val lit: Lit) : Exp
+
+data class EVar(val id: Ident) : Exp
+
+data class EApp(val lhs: Exp, val rhs: Exp) : Exp
+
+data class EGroup(val value: Exp) : Exp
+```
+
+> Lit.kt
+```kotlin
+sealed interface Lit
+
+data class LInt(val value: Int) : Lit
+
+data class LFloat(val value: Float) : Lit
+
+data class LString(val value: String) : Lit {
+  override fun toString(): String = "LStr(value=\"$value\")"
+}
+
+object LUnit : Lit {
+  override fun toString(): String = "()"
+}
+```
+
+> Ident.kt
+```kotlin
+data class Ident(val name: String, val displayName: String = name) {
+  override fun toString(): String = "'$displayName"
+}
+```
+
+> Alt.kt
+```kotlin
+data class Alt(val id: Ident, val patterns: List<Pat>, val exp: Exp)
+```
+
+> Pat.kt
+```kotlin
+sealed interface Pat
+
+data class PVar(val id: Ident) : Pat
+```
+
+### Type System
+
+The type system that we will use is
+the [Hindley Milner](https://en.wikipedia.org/wiki/Hindley%E2%80%93Milner_type_system)(also known as Damas-Milner or
+Damas-Hindley-Milner).
+We will also need an inference algorithm,
+the [Algorithm W](https://en.wikipedia.org/wiki/Hindley%E2%80%93Milner_type_system#Algorithm_W)
 
 ### See also
 
