@@ -12,7 +12,7 @@ import org.antlr.v4.kotlinruntime.CommonTokenStream
 import org.antlr.v4.kotlinruntime.DiagnosticErrorListener
 
 fun main() {
-  val stream = CharStreams.fromString("""let f x = x in f 1""")
+  val stream = CharStreams.fromString("""let f x = x, a = f id in a 1""")
 
   val lexer = EkkoLexer(stream)
   val parser = EkkoParser(CommonTokenStream(lexer)).apply {
@@ -23,7 +23,7 @@ fun main() {
   val exp = parser.exp()
 
   val env = buildMap {
-    put("id", Forall(setOf("a"), Typ.variable("a") arrow (Typ.Int arrow Typ.variable("a"))))
+    put("id", Forall(setOf("a"), Typ.variable("a") arrow Typ.variable("a")))
   }
 
   println(infer.synthExp(exp.treeToExp(), env))
