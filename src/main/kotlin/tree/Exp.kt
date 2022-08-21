@@ -2,7 +2,7 @@ package ekko.tree
 
 sealed interface Exp
 
-data class ELit(val literal: Lit) : Exp
+data class ELit(val lit: Lit) : Exp
 
 data class EVar(val id: Ident) : Exp
 
