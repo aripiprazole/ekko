@@ -68,6 +68,10 @@ You can use the default project wizard to create a new project.
 
 ## Parsing
 
+### ANTLR Kotlin
+
+We are using the [Strumenta's](https://strumenta.com/) [antlr-kotlin](https://github.com/Strumenta/antlr-kotlin) for the Kotlin ANTLR target. You can checkout [here](https://github.com/gabrielleeg1/ekko/blob/main/build.gradle.kts) project's buildscript.
+
 ### Abstract Syntax Tree
 
 The Abstract Syntax Tree(AST) is a tree representation of the Syntax using data types.
@@ -126,109 +130,6 @@ data class Alt(val id: Ident, val patterns: List<Pat>, val exp: Exp)
 sealed interface Pat
 
 data class PVar(val id: Ident) : Pat
-```
-
-### ANTLR Kotlin
-
-Setting up the [Strumenta](https://strumenta.com/)'s [antlr-kotlin](https://github.com/Strumenta/antlr-kotlin).
-
-We will use the legacy mode for the plugin, because it only exposes a Task.
-
-> build.gradle.kts
-
-```kt
-buildscript {
-  repositories {
-    maven("https://jitpack.io")
-    mavenCentral()
-  }
-
-  dependencies {
-    classpath("com.strumenta.antlr-kotlin:antlr-kotlin-gradle-plugin:$antlr_kotlin_version")
-  }
-}
-```
-
-> PS: Lookup the ANTLR Kotlin version at [JitPack](https://jitpack.io/#com.strumenta.antlr-kotlin/antlr-kotlin).
-
-The project will need to include the generated source code in the `main source set`.
-
-> build.gradle.kts
-
-```kotlin
-kotlin {
-  sourceSets {
-    main {
-      kotlin.srcDirs(rootProject.file("src/generated/kotlin"))
-    }
-  }
-}
-```
-
-#### Creating gradle task
-
-The project will need a gradle task to generate the parser grammar.
-
-Antlr-Kotlin generates source code with many warnings, with the Kotlin's compiler, Detekt, Ktlint, etc. so will need two tasks:
-
-> build.gradle.kts
-
-```kotlin
-val generateMainAntlrSource by tasks.creating(AntlrKotlinTask::class) {
-  val dependencies = project.dependencies
-
-  antlrClasspath = configurations.detachedConfiguration(
-    dependencies.create("org.antlr:antlr4:4.7.1"),
-    dependencies.create("com.strumenta.antlr-kotlin:antlr-kotlin-target:$antlr_kotlin_version"),
-  )
-  maxHeapSize = "64m"
-  arguments = listOf("-package", "ekko.parser")
-  source = project.objects
-    .sourceDirectorySet("antlr", "antlr")
-    .srcDir("src/main/antlr").apply {
-      include("*.g4")
-    }
-  outputDirectory = buildDir.resolve("build/generated/kotlin")
-}
-```
-
-And the task that will suppress the warnings as a [workaround].
-
-> build.gradle.kts
-
-```kt
-val generateAntlrSource by tasks.creating(Copy::class) {
-  dependsOn(generateMainAntlrSource)
-  from(buildDir.resolve("build/generated/kotlin"))
-  include("**/*.kt")
-  filter<KtSuppressFilterReader>()
-  into(rootProject.file("src/generated/kotlin"))
-}
-```
-
-> KtSuppressFilterReader.kt
-
-```kt
-class KtSuppressFilterReader(
-  reader: Reader,
-) : FilterReader(StringReader(SUPPRESS_ANNOT_HEADER + reader.readText())) {
-  companion object {
-    private val SUPPRESS_ANNOT_HEADER = arrayOf(
-      "UNNECESSARY_NOT_NULL_ASSERTION", "UNUSED_PARAMETER", "USELESS_CAST", "UNUSED_VALUE", "VARIABLE_WITH_REDUNDANT_INITIALIZER", "PARAMETER_NAME_CHANGED_ON_OVERRIDE", "SENSELESS_COMPARISON", "UNCHECKED_CAST", "UNUSED", "RemoveRedundantQualifierName", "RedundantCompanionReference", "RedundantVisibilityModifier", "FunctionName", "SpellCheckingInspection", "RedundantExplicitType", "ConvertSecondaryConstructorToPrimary", "ConstantConditionIf", "CanBeVal", "LocalVariableName", "RemoveEmptySecondaryConstructorBody", "LiftReturnOrAssignment", "MemberVisibilityCanBePrivate", "RedundantNullableReturnType", "OverridingDeprecatedMember", "EnumEntryName", "RemoveExplicitTypeArguments", "PrivatePropertyName", "ProtectedInFinal", "MoveLambdaOutsideParentheses", "UnnecessaryImport", "KotlinRedundantDiagnosticSuppress", "ClassName", "CanBeParameter", "Detekt.MaximumLineLength", "Detekt.MaxLineLength", "Detekt.FinalNewline", "ktlint",
-    ).joinToString(separator = ", ", prefix = "@file:Suppress(", postfix = ")\n\n") { "\"$it\"" }
-  }
-}
-
-```
-
-The `KtSuppressFilterReader` class you can put into the gradle build script, or use something like `composite builds` or `buildSrc`.
-
-After this, make the `compileKotlin` task depends on `generateAntlrSource`.
-
-```kotlin
-tasks.withType<KotlinCompile> {
-  dependsOn(generateAntlrSource)
-}
 ```
 
 ### ANTLR
