@@ -12,30 +12,31 @@ learning.
 ### Table of contents
 
 - [Writing Haskell in Kotlin](#writing-haskell-in-kotlin)
-  - [Table of contents](#table-of-contents)
-  - [What will be used](#what-will-be-used)
-  - [Getting started](#getting-started)
-    - [Yeoman](#yeoman)
-    - [IntelliJ](#intellij)
-  - [Parsing](#parsing)
-    - [Abstract Syntax Tree](#abstract-syntax-tree)
-    - [ANTLR](#antlr)
-    - [Mapping](#mapping-ast)
-    - [Pretty printing](#pretty-printing)
-  - [Resolving](#resolving)
-    - [Resolving names](#resolving-names)
-    - [Resolving imports](#resolving-imports)
-    - [Validating](#validating)
-    - [Resolved tree](#resolved-tree)
-  - [Type System](#type-system)
-    - [Algorithm W](#algorithm-w)
-    - [Mutable substitutions](#mutable-substs)
-    - [Mutable references](#mutable-references)
-    - [Typed tree](#typed-tree)
-    - [Type classes](#type-classes)
-  - [Evaluating](#eval)
-  - [See also](#see-also)
-  - [Bibliography](#bibliography)
+    - [Table of contents](#table-of-contents)
+    - [What will be used](#what-will-be-used)
+    - [Getting started](#getting-started)
+      - [Yeoman](#yeoman)
+      - [IntelliJ](#intellij)
+    - [Parsing](#parsing)
+      - [Abstract Syntax Tree](#abstract-syntax-tree)
+      - [ANTLR](#antlr)
+      - [Mapping](#mapping)
+      - [Pretty printing](#pretty-printing)
+    - [Resolving](#resolving)
+      - [Resolving names](#resolving-names)
+      - [Resolving imports](#resolving-imports)
+      - [Validating](#validating)
+      - [Resolved Tree](#resolved-tree)
+    - [Type System](#type-system)
+      - [Parametric Polymorphism](#parametric-polymorphism)
+      - [Algorithm W](#algorithm-w)
+      - [Mutable substitutions](#mutable-substitutions)
+      - [Mutable references](#mutable-references)
+      - [Typed tree](#typed-tree)
+      - [Type classes](#type-classes)
+    - [Evaluating](#evaluating)
+    - [See also](#see-also)
+    - [Bibliography](#bibliography)
 
 ### What will be used
 
@@ -121,6 +122,22 @@ sealed interface Pat
 data class PVar(val id: Ident) : Pat
 ```
 
+#### ANTLR
+
+#### Mapping
+
+#### Pretty printing
+
+### Resolving
+
+#### Resolving names
+
+#### Resolving imports
+
+#### Validating
+
+#### Resolved Tree
+
 ### Type System
 
 The type system that we will use is
@@ -128,6 +145,20 @@ the [Hindley Milner](https://en.wikipedia.org/wiki/Hindley%E2%80%93Milner_type_s
 Damas-Hindley-Milner).
 We will also need an inference algorithm,
 the [Algorithm W](https://en.wikipedia.org/wiki/Hindley%E2%80%93Milner_type_system#Algorithm_W)
+
+#### Parametric Polymorphism
+
+#### Algorithm W
+
+#### Mutable substitutions
+
+#### Mutable references
+
+#### Typed tree
+
+#### Type classes
+
+### Evaluating
 
 ### See also
 
