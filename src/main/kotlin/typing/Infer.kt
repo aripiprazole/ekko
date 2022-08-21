@@ -10,7 +10,7 @@ import ekko.tree.EVar
 import ekko.tree.Exp
 import ekko.tree.LFloat
 import ekko.tree.LInt
-import ekko.tree.LStr
+import ekko.tree.LString
 import ekko.tree.LUnit
 import ekko.tree.Lit
 import ekko.tree.PVar
@@ -97,7 +97,7 @@ class Infer {
     return when (lit) {
       is LInt -> Typ.Int
       is LFloat -> Typ.Float
-      is LStr -> Typ.Str
+      is LString -> Typ.String
       is LUnit -> Typ.Unit
     }
   }

@@ -5,7 +5,7 @@ sealed interface Typ {
     val Unit: Typ = constructor("()")
     val Int: Typ = constructor("Int")
     val Float: Typ = constructor("Float")
-    val Str: Typ = constructor("Str")
+    val String: Typ = constructor("String")
     val Arrow: Typ = constructor("->")
 
     fun variable(name: String): Typ = TVar(name)

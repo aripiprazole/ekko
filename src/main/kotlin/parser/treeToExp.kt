@@ -6,7 +6,7 @@ import ekko.parser.EkkoParser.EDecimalContext
 import ekko.parser.EkkoParser.EGroupContext
 import ekko.parser.EkkoParser.EIntContext
 import ekko.parser.EkkoParser.ELetContext
-import ekko.parser.EkkoParser.EStrContext
+import ekko.parser.EkkoParser.EStringContext
 import ekko.parser.EkkoParser.EVarContext
 import ekko.parser.EkkoParser.ExpContext
 import ekko.tree.EAbs
@@ -18,7 +18,7 @@ import ekko.tree.EVar
 import ekko.tree.Exp
 import ekko.tree.LFloat
 import ekko.tree.LInt
-import ekko.tree.LStr
+import ekko.tree.LString
 
 fun ExpContext.treeToExp(): Exp {
   return when (this) {
@@ -48,10 +48,10 @@ fun ExpContext.treeToExp(): Exp {
       EGroup(value)
     }
 
-    is EStrContext -> {
+    is EStringContext -> {
       val text = value!!.text!!.substring(1, value!!.text!!.length - 1)
 
-      ELit(LStr(text))
+      ELit(LString(text))
     }
 
     is EDecimalContext -> {

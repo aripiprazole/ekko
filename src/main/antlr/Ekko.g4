@@ -25,7 +25,7 @@ alt: name=IDENT pat* EQ value=exp;
 exp: LET alt (COLON alt)* IN value=exp # ELet
    | BAR param=pat ARROW value=exp     # EAbs
    | value=IDENT                       # EVar
-   | value=STRING                      # EStr
+   | value=STRING                      # EString
    | value=INT                         # EInt
    | value=DECIMAL                     # EDecimal
    | lhs=exp rhs=exp                   # EApp

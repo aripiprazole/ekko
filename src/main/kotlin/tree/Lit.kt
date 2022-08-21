@@ -6,7 +6,7 @@ data class LInt(val value: Int) : Lit
 
 data class LFloat(val value: Float) : Lit
 
-data class LStr(val value: String) : Lit {
+data class LString(val value: String) : Lit {
   override fun toString(): String = "LStr(value=\"$value\")"
 }
 
