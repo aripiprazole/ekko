@@ -23,16 +23,15 @@ learning.
     - [Mapping](#mapping)
     - [Pretty printing](#pretty-printing)
   - [Resolving](#resolving)
-    - [Resolving names](#resolving-names)
-    - [Resolving imports](#resolving-imports)
+    - [Name resolving](#name-resolving)
+    - [Import resolving](#import-resolving)
     - [Validating](#validating)
     - [Resolved Tree](#resolved-tree)
   - [Type System](#type-system)
-    - [Parametric Polymorphism](#parametric-polymorphism)
     - [Algorithm W](#algorithm-w)
     - [Mutable substitutions](#mutable-substitutions)
     - [Mutable references](#mutable-references)
-    - [Typed tree](#typed-tree)
+    - [Elaborating](#elaborating)
     - [Type classes](#type-classes)
   - [Evaluating](#evaluating)
   - [See also](#see-also)
@@ -130,9 +129,9 @@ data class PVar(val id: Ident) : Pat
 
 ## Resolving
 
-### Resolving names
+### Name resolving
 
-### Resolving imports
+### Import resolving
 
 ### Validating
 
@@ -146,15 +145,13 @@ Damas-Hindley-Milner).
 We will also need an inference algorithm,
 the [Algorithm W](https://en.wikipedia.org/wiki/Hindley%E2%80%93Milner_type_system#Algorithm_W)
 
-### Parametric Polymorphism
-
 ### Algorithm W
 
 ### Mutable substitutions
 
 ### Mutable references
 
-### Typed tree
+### Elaborating
 
 ### Type classes
 
