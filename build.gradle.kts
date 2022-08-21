@@ -58,11 +58,9 @@ dependencies {
 }
 
 val generateMainAntlrSource by tasks.creating(AntlrKotlinTask::class) {
-  val dependencies = project.dependencies
-
   antlrClasspath = configurations.detachedConfiguration(
-    dependencies.create("org.antlr:antlr4:4.7.1"),
-    dependencies.create("com.strumenta.antlr-kotlin:antlr-kotlin-target:160bc0b70f"),
+    project.dependencies.create("org.antlr:antlr4:4.7.1"),
+    project.dependencies.create("com.strumenta.antlr-kotlin:antlr-kotlin-target:160bc0b70f"),
   )
   maxHeapSize = "64m"
   arguments = listOf("-package", "ekko.parser")
@@ -71,17 +69,16 @@ val generateMainAntlrSource by tasks.creating(AntlrKotlinTask::class) {
     .srcDir("src/main/antlr").apply {
       include("*.g4")
     }
+
+  // Temporary folder for antlr generated files to be copied with `generateAntlrSource` task suppressing the warnings
   outputDirectory = buildDir.resolve("build/generated/kotlin")
 }
 
-/**
- * Workaround to suppress all warnings in generated parser source.
- *
- * Original issue is [here](https://github.com/Strumenta/antlr-kotlin/issues/36).
- */
+// Workaround to suppress Kotlin, Detekt and Ktlint warnings in generated parser source.
+// The original issue is at https://github.com/Strumenta/antlr-kotlin/issues/36.
 val generateAntlrSource by tasks.creating(Copy::class) {
   dependsOn(generateMainAntlrSource)
-  from(buildDir.resolve("build/generated/kotlin"))
+  from(buildDir.resolve("build/generated/kotlin")) // The previous configured temporary folder
   include("**/*.kt")
   filter<KtSuppressFilterReader>()
   into(rootProject.file("src/generated/kotlin"))
@@ -92,6 +89,8 @@ tasks.test {
 }
 
 tasks.withType<KotlinCompile> {
+  // Makes the kotlin compile task depends on `generateAntlrSource` task, to be easier to set up a CI pipeline, or even
+  // build the project
   dependsOn(generateAntlrSource)
   kotlinOptions.jvmTarget = "1.8"
 }
