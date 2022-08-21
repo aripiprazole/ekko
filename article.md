@@ -19,8 +19,6 @@ learning.
     - [IntelliJ](#intellij)
   - [Parsing](#parsing)
     - [Abstract Syntax Tree](#abstract-syntax-tree)
-    - [ANTLR Kotlin](#antlr-kotlin)
-      - [Creating gradle task](#creating-gradle-task)
     - [ANTLR](#antlr)
     - [Mapping](#mapping)
     - [Pretty printing](#pretty-printing)
@@ -68,19 +66,16 @@ You can use the default project wizard to create a new project.
 
 ## Parsing
 
-### ANTLR Kotlin
+Parsing can be hard when trying to write a parser from scratch, even if it is a top-down parser, combinators, etc... So this article we are going to use `ANTLR`, that is a full-featured parser generator, that generates for differents targets(Java, C#, etc), so you can reutilize the parser in another projects.
 
-We are using the [Strumenta's](https://strumenta.com/) [antlr-kotlin](https://github.com/Strumenta/antlr-kotlin) for the Kotlin ANTLR target. You can checkout [here](https://github.com/gabrielleeg1/ekko/blob/main/build.gradle.kts) project's buildscript.
+The Kotlin target for ANTLR, does not have official support, so we are going to use [Strumenta's](https://strumenta.com/) [antlr-kotlin](https://github.com/Strumenta/antlr-kotlin). You can checkout [here](https://github.com/gabrielleeg1/ekko/blob/main/build.gradle.kts) project's buildscript configuration for `antlr-kotlin`.
 
 ### Abstract Syntax Tree
 
-The Abstract Syntax Tree(AST) is a tree representation of the Syntax using data types.
-
-The initial AST of Ekko project is:
-
-> Exp.kt
+The Abstract Syntax Tree(AST) is a tree representation of the Syntax using data types. The initial AST of Ekko project is:
 
 ```kotlin
+// Exp.kt
 sealed interface Exp
 
 data class ELit(val lit: Lit) : Exp
@@ -92,9 +87,8 @@ data class EApp(val lhs: Exp, val rhs: Exp) : Exp
 data class EGroup(val value: Exp) : Exp
 ```
 
-> Lit.kt
-
 ```kotlin
+// Lit.kt
 sealed interface Lit
 
 data class LInt(val value: Int) : Lit
@@ -110,23 +104,20 @@ object LUnit : Lit {
 }
 ```
 
-> Ident.kt
-
 ```kotlin
+// Ident.kt
 data class Ident(val name: String, val displayName: String = name) {
   override fun toString(): String = "'$displayName"
 }
 ```
 
-> Alt.kt
-
 ```kotlin
+// Alt.kt
 data class Alt(val id: Ident, val patterns: List<Pat>, val exp: Exp)
 ```
 
-> Pat.kt
-
 ```kotlin
+// Pat.kt
 sealed interface Pat
 
 data class PVar(val id: Ident) : Pat
