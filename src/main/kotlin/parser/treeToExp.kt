@@ -21,9 +21,7 @@ import ekko.tree.LStr
 fun ExpContext.treeToExp(): Exp {
   return when (this) {
     is ELetContext -> {
-      val names = names!!.findVariable().associate { variable ->
-        variable.name!!.treeToIdent() to variable.value!!.treeToExp()
-      }
+      val names = findAlt().map { it.treeToAlt() }.associateBy { it.name }
       val value = value!!.treeToExp()
 
       ELet(names, value)

@@ -16,13 +16,14 @@ STRING: '"' (~["\r\n\\] | '\\' ~[\r\n])* '"';
 INT: [0-9]+ ;
 DECIMAL: INT '.' INT;
 
-variable: name=IDENT EQ value=exp;
-variableList: variable (COLON variable)*;
+pat: name=IDENT # PVar;
 
-exp: LET names=variableList IN value=exp # ELet
-   | value=IDENT                         # EVar
-   | value=STRING                        # EStr
-   | value=INT                           # EInt
-   | value=DECIMAL                       # EDecimal
-   | lhs=exp rhs=exp                     # EApp
-   | LPAREN value=exp RPAREN             # EGroup;
+alt: name=IDENT pat* EQ value=exp;
+
+exp: LET alt (COLON alt)* IN value=exp # ELet
+   | value=IDENT                       # EVar
+   | value=STRING                      # EStr
+   | value=INT                         # EInt
+   | value=DECIMAL                     # EDecimal
+   | lhs=exp rhs=exp                   # EApp
+   | LPAREN value=exp RPAREN           # EGroup;
