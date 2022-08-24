@@ -1,6 +1,6 @@
 grammar Ekko;
 
-NEWLINE: ([\r\n] | [\n])+;
+NEWLINE: ([\r] | [\n])+;
 WS: (' ' | '\t' | NEWLINE)+ -> channel(HIDDEN);
 
 LET: 'let';
