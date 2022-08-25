@@ -34,7 +34,7 @@ module Person where
   --
   -- or matching the parameter:
   -- sayHello : Person -> IO ()
-  -- sayHello person = \case person
+  -- sayHello person = case person of
   --  (Person name age) -> println "Hello, I'm $name, and i'm $age years old"
 
 people : [Person]
@@ -53,13 +53,35 @@ main = do
   println "hello, world"
 ```
 
+But this model, is a little complex to start with, because, there are many features, like `type classes`(the `traverse` function),
+`lambdas`, `pattern matching`, `enums`, etc... And this is going to be hard to implement at the first view, so we will simplify it.
+
+```haskell
+data Person = Person {
+  name : String,
+  age : Int
+}
+
+main : ()
+main =
+  let person = Person "Carlos" 19 in
+  println person
+```
+
+And with this simple model, we will be incrementing throughout this article. This model does not have the following features:
+- interpolation
+- type classes(instances, etc...)
+- enums
+- pattern matching
+- externals
+
 ## Abstract Syntax Tree
 
 The Abstract Syntax Tree(known briefly as AST) is a tree representation of the Syntax using data types. The initial AST
 of Ekko project is:
 
 Expression in the base of expressions in a programming language, which can be in Ekko's case, from literals(integers,
-decimals, strings, unit) to function calls(known as `EApp`) and lambdas(that will not be implemented in this moment of
+decimals, strings, unit) to function calls(known as `EApp`) and lambdas(that will not be implemented at this moment of
 the article).
 
 ```kotlin
