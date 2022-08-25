@@ -74,6 +74,8 @@ And with this simple model, we will be incrementing throughout this article. Thi
 - enums
 - pattern matching
 - externals
+- do notation/monads
+- pureness
 
 ## Abstract Syntax Tree
 
