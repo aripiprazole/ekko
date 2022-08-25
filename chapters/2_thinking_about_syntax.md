@@ -1,10 +1,66 @@
 # Thinking about syntax
 
+Our goal in Ekko project, is having a full haskell-like language, with imports, lambdas, pattern matching, and even type
+classes. And, said that, we need to model our language.
+
+```haskell
+data Either a b = Left a | Right b
+
+data Maybe a = Nothing | Just a
+
+data Person = Person {
+  name : String,
+  age : Int
+}
+
+external
+println : String -> IO ()
+
+module Person where
+  -- omit the function type
+  default = Person {
+    name : "Carlos",
+    age : 19
+  }
+  
+  sayHello : Person -> IO ()
+  sayHello (Person name age) =
+    println "Hello, I'm $name, and i'm $age years old"
+    
+  -- or matching:
+  -- sayHello : Person -> IO ()
+  -- sayHello = \case
+  --  (Person name age) -> println "Hello, I'm $name, and i'm $age years old"
+  --
+  -- or matching the parameter:
+  -- sayHello : Person -> IO ()
+  -- sayHello person = \case person
+  --  (Person name age) -> println "Hello, I'm $name, and i'm $age years old"
+
+people : [Person]
+people = [
+  Person.default,
+  Person.default { name = "João" },
+  Person.default { name = "Maria" }
+]
+
+main : IO ()
+main = do
+  traverse $ (\x -> sayHello x) <$> people
+  -- or passing the lambda reference
+  -- traverse $ sayHello <$> people
+  
+  println "hello, world"
+```
+
 ## Abstract Syntax Tree
 
-The Abstract Syntax Tree(known briefly as AST) is a tree representation of the Syntax using data types. The initial AST of Ekko project is:
+The Abstract Syntax Tree(known briefly as AST) is a tree representation of the Syntax using data types. The initial AST
+of Ekko project is:
 
-Expression in the base of expressions in a programming language, which can be in Ekko's case, from literals(integers, decimals, strings, unit) to function calls(known as `EApp`) and lambdas(that will not be implemented in this moment of the article).
+Expression in the base of expressions in a programming language, which can be in Ekko's case, from literals(integers,
+decimals, strings, unit) to function calls(known as `EApp`) and lambdas(that will not be implemented in this moment of
+the article).
 
 ```kotlin
 // Exp.kt
@@ -33,7 +89,8 @@ object LUnit : Lit {
 }
 ```
 
-`Ident` are identifiers in the source code, that represents a name in the source code, like in `var expressions`(like `println`, `x`; var expressions are expressions that access a variable in the context).
+`Ident` are identifiers in the source code, that represents a name in the source code, like in `var expressions`(
+like `println`, `x`; var expressions are expressions that access a variable in the context).
 
 ```kotlin
 // Ident.kt
@@ -42,14 +99,17 @@ data class Ident(val name: String, val displayName: String = name) {
 }
 ```
 
-...And `Alt` are alternatives in a function, or in let bindings, like: `let f x = x in f 10`. They have patterns as parameters, to enable the pattern matching at call, like Haskell, Elixir also do, and have an expression as the "body", because the language is going to be a pure functional language.
+...And `Alt` are alternatives in a function, or in let bindings, like: `let f x = x in f 10`. They have patterns as
+parameters, to enable the pattern matching at call, like Haskell, Elixir also do, and have an expression as the "body",
+because the language is going to be a pure functional language.
 
 ```kotlin
 // Alt.kt
 data class Alt(val id: Ident, val patterns: List<Pat>, val exp: Exp)
 ```
 
-So, `Pat` are representations of patterns, that at this moment, will not be taken in-deep, to maintain the simplicity. But currently have a representation of name identifiers.
+So, `Pat` are representations of patterns, that at this moment, will not be taken in-deep, to maintain the simplicity.
+But currently have a representation of name identifiers.
 
 ```kotlin
 // Pat.kt
