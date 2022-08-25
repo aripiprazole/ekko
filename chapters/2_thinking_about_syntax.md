@@ -2,7 +2,7 @@
 
 ## Abstract Syntax Tree
 
-The Abstract Syntax Tree(known briefily as AST) is a tree representation of the Syntax using data types. The initial AST of Ekko project is:
+The Abstract Syntax Tree(known briefly as AST) is a tree representation of the Syntax using data types. The initial AST of Ekko project is:
 
 Expression in the base of expressions in a programming language, which can be in Ekko's case, from literals(integers, decimals, strings, unit) to function calls(known as `EApp`) and lambdas(that will not be implemented in this moment of the article).
 
