@@ -68,6 +68,10 @@ DECIMAL: INT '.' INT;
 In our case, an identifier can have any character from a to z(that can be uppercased), underscores, apostrophes, and
 numbers, but can never start with a number. And the string, can interpolate the `\` character and have line breaks.
 
+> PS: the order of the lexer rules matters in deciding that will be chosen by the generated lexer in "ambiguities" like
+> with a rule like `IDENT` and a rule that matches `YES: yes`, if you put the `IDENT` after the `YES`, the `YES` will be
+> chosen, and the `IDENT` will be ignored.
+
 ### Parsing
 
 Parsing can be a hard thing, when you don't have a parser generator, but with ANTLR, you have left recursion and can do
@@ -96,7 +100,7 @@ exp: value=IDENT             # EVar
 ```
 
 > Never add a name for token rules that you will not use in the source code like with `LPAREN` and `RPAREN`, this will
-just be unused.
+> just be unused.
 
 Now we can parse more complex expressions like `applications`(function calls) and `lambdas`:
 
