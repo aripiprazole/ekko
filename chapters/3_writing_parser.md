@@ -6,7 +6,7 @@ targets(Java, C#, etc), so you can reutilize the parser in another projects.
 
 The Kotlin target for ANTLR, does not have official support, so we are going to
 use [Strumenta's](https://strumenta.com/) [antlr-kotlin](https://github.com/Strumenta/antlr-kotlin). You can
-checkout [here](https://github.com/gabrielleeg1/ekko/blob/main/build.gradle.kts) project's buildscript configuration
+check out [here](https://github.com/gabrielleeg1/ekko/blob/main/build.gradle.kts) project's buildscript configuration
 for `antlr-kotlin`.
 
 ## Using ANTLR for Grammar
