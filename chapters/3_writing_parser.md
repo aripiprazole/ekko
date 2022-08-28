@@ -67,3 +67,54 @@ DECIMAL: INT '.' INT;
 
 In our case, an identifier can have any character from a to z(that can be uppercased), underscores, apostrophes, and
 numbers, but can never start with a number. And the string, can interpolate the `\` character and have line breaks.
+
+### Parsing
+
+Parsing can be a hard thing, when you don't have a parser generator, but with ANTLR, you have left recursion and can do
+things very simple for the parser. So let's start with a simple expression:
+
+```antlrv4
+exp: value=IDENT   # EVar
+   | value=STRING  # EString
+   | value=INT     # EInt
+   | value=DECIMAL # EDecimal
+   ;
+```
+
+Look that we can match values, and the generator get the things done for us. And the `value=` is the name of the
+property that will be generated in the `antlr generated tree`.
+
+We can match more lexer rules in a parser rule, like when adding the `group expression`:
+
+```antlrv4
+exp: value=IDENT             # EVar
+   | value=STRING            # EString
+   | value=INT               # EInt
+   | value=DECIMAL           # EDecimal
+   | LPAREN value=exp RPAREN # EGroup
+   ;
+```
+
+> Never add a name for token rules that you will not use in the source code like with `LPAREN` and `RPAREN`, this will
+just be unused.
+
+Now we can parse more complex expressions like `applications`(function calls) and `lambdas`:
+
+```antlrv4
+exp: ... 
+   | lhs=exp rhs=exp               # EApp
+   | BAR param=pat ARROW value=exp # EAbs
+   ;
+```
+
+And with this pattern, we can implement the `let expression` too, and combine more parser rules:
+
+```antlrv4
+pat: name=IDENT # PVar;
+
+alt: name=IDENT pat* EQ value=exp;
+
+exp: LET alt (COLON alt)* IN value=exp # ELet
+   | ...
+   ;
+```
