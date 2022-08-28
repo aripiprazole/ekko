@@ -193,3 +193,32 @@ fun ExpContext.treeToExp(file: File): Exp {
 
 We will need to make this job for all the other rules of the parser, walking throughout all the antlr tree, so we can
 get the new mapped tree.
+
+### Notes for mapping
+
+With the Kotlin 1.7 update, we can use `context receivers` with a specific compiler flag, and this will make the code
+cleaner like:
+
+```kotlin
+context(File)
+fun ParserRuleContext.currentLocation(): Location {
+  return Location(Position(start!!.startIndex, this@File), Position(stop!!.stopIndex, this@File))
+}
+
+context(File)
+fun ExpContext.treeToExp(): Exp {
+  return when (this) {
+    is ELetContext -> {
+      val names = findAlt().map { it.treeToAlt() }.associateBy { it.id }
+      val value = value!!.treeToExp()
+
+      ELet(names, value, currentLocation())
+    }
+
+    // ...
+  }
+}
+```
+
+But in this article, we are regarding the compatibility, so it will not be used here, because it is an experimental
+feature in the kotlin project's version.
