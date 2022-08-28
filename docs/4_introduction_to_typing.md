@@ -11,7 +11,7 @@ in [set theory](https://en.wikipedia.org/wiki/Set_theory). We can have inference
 
 $$ {x:\sigma \in \Gamma} \over {\Gamma \vdash x:\sigma} $$
 
-That means, if we know that $x$ have a type $sigma$ in context $\Gamma$, so $x$ have a type $sigma$.
+That means, if we know that $x$ have a type $\sigma$ in context $\Gamma$, so $x$ have a type $sigma$.
 
 ## Hindley Milner
 
