@@ -1,5 +1,5 @@
 package ekko.tree
 
-data class Ident(val name: String, val displayName: String = name) {
+data class Ident(val name: String, val displayName: String = name, val location: Location) {
   override fun toString(): String = "'$displayName"
 }

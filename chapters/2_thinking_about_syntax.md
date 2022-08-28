@@ -53,8 +53,10 @@ main = do
   println "hello, world"
 ```
 
-But this model, is a little complex to start with, because, there are many features, like `type classes`(the `traverse` function),
-`lambdas`, `pattern matching`, `enums`, etc... And this is going to be hard to implement at the first view, so we will simplify it.
+But this model, is a little complex to start with, because, there are many features, like `type classes`(the `traverse`
+function),
+`lambdas`, `pattern matching`, `enums`, etc... And this is going to be hard to implement at the first view, so we will
+simplify it.
 
 ```haskell
 data Person = Person {
@@ -68,7 +70,9 @@ main =
   println person
 ```
 
-And with this simple model, we will be incrementing throughout this article. This model does not have the following features:
+And with this simple model, we will be incrementing throughout this article. This model does not have the following
+features:
+
 - interpolation
 - type classes(instances, etc...)
 - enums
@@ -141,3 +145,56 @@ sealed interface Pat
 
 data class PVar(val id: Ident) : Pat
 ```
+
+## Location
+
+We can add a location data type to the AST, to keep track of the source code location of each element. The importance of
+maintaining the location between the elements of the AST, are:
+
+* readability
+* error handling
+* debugging (in the compiler development)
+* breakpoints (in case of real debugging with something like `nvim-dap` in neovim or even the intellij debugger)
+
+```kotlin
+// Location.kt
+data class Location(val start: Position, val end: Position)
+
+class Position {
+  val line: Int
+  val column: Int
+
+  // Note that we suppress `ConvertSecondaryConstructorToPrimary` due to `return` expressions, so we
+  // can still have the `line` and `column` properties immutable.
+  @Suppress("ConvertSecondaryConstructorToPrimary")
+  constructor(position: Int, file: File) {
+    var lineNumber = 0
+    var charPosition = 0
+    for (line in file.readLines()) {
+      lineNumber++
+      var columnNumber = 0
+      for (column in line) {
+        charPosition++
+        columnNumber++
+
+        if (charPosition == position) {
+          this.line = lineNumber
+          this.column = columnNumber
+          return
+        }
+      }
+      charPosition++
+      if (charPosition == position) {
+        this.line = lineNumber
+        this.column = columnNumber
+        return
+      }
+    }
+    this.line = -1
+    this.column = -1
+  }
+}
+```
+
+This is a snippet for finding the line and column of both of the `start` and the `end` of a `text range`(the `Location`
+class)

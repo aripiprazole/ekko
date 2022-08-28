@@ -1,15 +1,17 @@
 package ekko.tree
 
-sealed interface Lit
+sealed interface Lit {
+  val location: Location
+}
 
-data class LInt(val value: Int) : Lit
+data class LInt(val value: Int, override val location: Location) : Lit
 
-data class LFloat(val value: Float) : Lit
+data class LFloat(val value: Float, override val location: Location) : Lit
 
-data class LString(val value: String) : Lit {
+data class LString(val value: String, override val location: Location) : Lit {
   override fun toString(): String = "LString(value=\"$value\")"
 }
 
-object LUnit : Lit {
+class LUnit(override val location: Location) : Lit {
   override fun toString(): String = "()"
 }

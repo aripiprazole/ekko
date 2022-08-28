@@ -2,7 +2,7 @@ package ekko.tree
 
 sealed interface Pat
 
-data class PVar(val id: Ident) : Pat
+data class PVar(val id: Ident, val location: Location = id.location) : Pat
 
 // data class PAs(val id: Ident, val pat: Pat) : Pat
 //
