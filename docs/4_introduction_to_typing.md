@@ -17,16 +17,22 @@ That means, if we know that $x$ have a type $sigma$ in context $\Gamma$, so $x$ 
 
 The Ekko's base type system is going to be the [Hindley Milner](https://en.wikipedia.org/wiki/Hindley%E2%80%93Milner_type_system). And it can be described with the syntax rules previously described.
 
+### Expressions
+
+The expressions, that are based in lambda-calculus, extended with a let-expression. That can be represented with out previously written abstract syntax tree.
+
 $$
 \begin{array}{lrll}
-  e & =     & x                                   & \textrm{EVar}\\
-    & \vert & e_1\ e_2                            & \textrm{EApp}\\
+  e & =     & x                                   & \textrm{EVar} \\
+    & \vert & e_1\ e_2                            & \textrm{EApp} \\
     & \vert & \lambda\ x\ .\ e                    & \textrm{EAbs} \\
-    & \vert & \mathtt{let}\ x = e_1\ \mathtt{in}\ e_2 &\\
+    & \vert & \mathtt{let}\ x = e_1\ \mathtt{in}\ e_2 & \\
 \end{array}
 $$
 
-The expressions, that are based in lambda-calculus, extended with a let-expression. And then we have the definition of types:
+### Types
+
+And then we have the definition of types:
 
 $$
 \begin{array}{llrll}
@@ -34,8 +40,34 @@ $$
                 &      &\vert & 'x             & \ \textrm{TCon} \\
                 &      &\vert & \tau_1\ \tau_2 & \ \textrm{TApp} \\
   \\
-  \textrm{poly} & \sigma &= & \forall\ \alpha_1\dots\alpha_n\ .\ \tau & \ \textrm{Scheme}\\
+  \textrm{poly} & \sigma &= & \forall\ \alpha_1\dots\alpha_n.\ \tau & \ \textrm{Scheme}\\
 \end{array}
 $$
 
-The type system, have [parametric polymorphism](https://en.wikipedia.org/wiki/Parametric_polymorphism)(known as generic programming in many languages), so we have the type schemes to represent it.
+We have the poly types that represent [parametric polymorphism](https://en.wikipedia.org/wiki/Parametric_polymorphism)(known as generic programming in many languages). That are represented like:
+
+$$
+id : \forall \alpha.\ \alpha \rightarrow \alpha
+$$
+
+The $\forall$ represents the type parameters, and after the $.$, is the proper type. This structure can be represented in kotlin with the following classes:
+
+```kotlin
+// Typ.kt
+
+// mono τ =
+sealed interface Typ
+  // α
+  data class TCon(val id: String) : Typ
+
+  // 'x
+  data class TVar(val id: String) : Typ
+
+  // τ_1 τ_2
+  data class TApp(val lhs: Typ, val rhs: Typ) : Typ
+
+// poly σ = ∀ α_1 ... α_n. τ
+data class Forall(val names: Set<String>, val typ: Typ)
+```
+
+> We can after writing the classes, implement the [toString] function to make easier to debug, like [Typ.kt](https://github.com/gabrielleeg1/ekko/blob/main/src/main/kotlin/typing/Typ.kt) and [Forall.kt](https://github.com/gabrielleeg1/ekko/blob/main/src/main/kotlin/typing/Forall.kt).
