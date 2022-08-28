@@ -123,6 +123,18 @@ exp: LET alt (COLON alt)* IN value=exp # ELet
    ;
 ```
 
+### Debugging
+
+Debugging the antlr generated tree is hard without mapping, so we can
+use [this snippet](https://github.com/gabrielleeg1/ekko/blob/main/src/main/kotlin/parser/ParseTree.kt) for pretty
+printing a simplified version of the generated parse tree. For example:
+
+```kotlin
+val parser: EkkoParser
+
+println(parser.exp().toParseTree().multilineString())
+```
+
 ## Mapping tree to the AST
 
 The generated code from the parser will never replace our AST, cause its dirty and uncontrolled/not versioned by git.
