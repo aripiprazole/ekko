@@ -50,6 +50,8 @@ fun ExpContext.treeToExp(file: File): Exp {
     }
 
     is EStringContext -> {
+      // We use `.substring()` here, because the lexer includes the " characters at the start and at
+      // the end of the string.
       val text = value!!.text!!.substring(1, value!!.text!!.length - 1)
 
       ELit(LString(text, getLocationIn(file)))

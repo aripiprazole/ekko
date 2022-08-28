@@ -94,6 +94,7 @@ the article).
 // Exp.kt
 sealed interface Exp
 
+data class ELet(val bindings: Map<Ident, Alt>, val value: Exp) : Exp
 data class ELit(val lit: Lit) : Exp
 data class EVar(val id: Ident) : Exp
 data class EApp(val lhs: Exp, val rhs: Exp) : Exp

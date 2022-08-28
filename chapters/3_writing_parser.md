@@ -122,3 +122,74 @@ exp: LET alt (COLON alt)* IN value=exp # ELet
    | ...
    ;
 ```
+
+## Mapping tree to the AST
+
+The generated code from the parser will never replace our AST, cause its dirty and uncontrolled/not versioned by git.
+So we need to map the tree to the AST.
+
+We can start making utilitary functions like:
+
+```kotlin
+// parserUtils.kt
+
+fun ParserRuleContext.getLocationIn(file: File): Location {
+  return Location(
+    start = Position(start!!.startIndex, file),
+    end = Position(stop!!.stopIndex, file),
+  )
+}
+
+fun Token.treeToIdent(file: File): Ident {
+  return Ident(
+    text!!,
+    location = Location(
+      start = Position(startIndex, file),
+      end = Position(stopIndex, file),
+    ),
+  )
+}
+```
+
+This will make easier to deal with locations when mapping. So we can start by defining a function that
+maps `expressions`:
+
+```kotlin
+// treeToExp.kt
+
+// The properties generated with `antlr-kotlin` are always nullable, so we need to coerce that variables that we know 
+// aren't null.
+fun ExpContext.treeToExp(file: File): Exp {
+  return when (this) {
+    is ELetContext -> {
+      val names = findAlt().map { it.treeToAlt(file) }.associateBy { it.id }
+      val value = value!!.treeToExp(file)
+
+      ELet(names, value, getLocationIn(file))
+    }
+
+    is EAppContext -> {
+      val lhs = lhs!!.treeToExp(file)
+      val rhs = rhs!!.treeToExp(file)
+
+      EApp(lhs, rhs, getLocationIn(file))
+    }
+
+    is EStringContext -> {
+      // We use `.substring()` here, because the lexer includes the " characters at the start and at
+      // the end of the string.
+      val text = value!!.text!!.substring(1, value!!.text!!.length - 1)
+
+      ELit(LString(text, getLocationIn(file)))
+    }
+
+    // ...
+  }
+}
+```
+
+> The entire source code of mappers described in this article is
+> located [here](https://github.com/gabrielleeg1/ekko/tree/main/src/main/kotlin/parser).
+
+We will need to make this job for all the other rules of the parser, walking throughout all the antlr tree, so we can
+get the new mapped tree.
