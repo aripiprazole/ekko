@@ -139,7 +139,7 @@ Debugging the antlr generated tree is hard without mapping, so we can
 use [this snippet](https://github.com/gabrielleeg1/ekko/blob/main/src/main/kotlin/parser/ParseTree.kt) for pretty
 printing a simplified version of the generated parse tree. For example:
 
-```kt
+```kotlin
 val parser: EkkoParser
 
 println(parser.exp().toParseTree().multilineString())
@@ -152,7 +152,7 @@ So we need to map the tree to the AST.
 
 We can start making utilitary functions like:
 
-```kt
+```kotlin
 // parserUtils.kt
 
 fun ParserRuleContext.getLocationIn(file: File): Location {
@@ -176,7 +176,7 @@ fun Token.treeToIdent(file: File): Ident {
 This will make easier to deal with locations when mapping. So we can start by defining a function that
 maps `expressions`:
 
-```kt
+```kotlin
 // treeToExp.kt
 
 // The properties generated with `antlr-kotlin` are always nullable, so we need to coerce that variables that we know
@@ -218,7 +218,7 @@ get the new mapped tree.
 With the Kotlin 1.7 update, we can use `context receivers` with a specific compiler flag, and this will make the code
 cleaner like:
 
-```kt
+```kotlin
 context(File)
 fun ParserRuleContext.currentLocation(): Location {
   return Location(Position(start!!.startIndex, this@File), Position(stop!!.stopIndex, this@File))
