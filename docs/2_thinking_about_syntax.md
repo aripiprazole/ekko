@@ -99,7 +99,7 @@ Expression in the base of expressions in a programming language, which can be in
 decimals, strings, unit) to function calls(known as `EApp`) and lambdas(that will not be implemented at this moment of
 the article).
 
-```kotlin
+```kt
 // Exp.kt
 sealed interface Exp
 
@@ -112,7 +112,7 @@ data class EGroup(val value: Exp) : Exp
 
 And literals are representation of simple and primary values, like pairs, tuples, integers, decimals, strings, units.
 
-```kotlin
+```kt
 // Lit.kt
 sealed interface Lit
 
@@ -130,7 +130,7 @@ object LUnit : Lit {
 `Ident` are identifiers in the source code, that represents a name in the source code, like in `var expressions`(
 like `println`, `x`; var expressions are expressions that access a variable in the context).
 
-```kotlin
+```kt
 // Ident.kt
 data class Ident(val name: String, val displayName: String = name) {
   override fun toString(): String = "'$displayName"
@@ -141,7 +141,7 @@ data class Ident(val name: String, val displayName: String = name) {
 parameters, to enable the pattern matching at call, like Haskell, Elixir also do, and have an expression as the "body",
 because the language is going to be a pure functional language.
 
-```kotlin
+```kt
 // Alt.kt
 data class Alt(val id: Ident, val patterns: List<Pat>, val exp: Exp)
 ```
@@ -149,7 +149,7 @@ data class Alt(val id: Ident, val patterns: List<Pat>, val exp: Exp)
 So, `Pat` are representations of patterns, that at this moment, will not be taken in-deep, to maintain the simplicity.
 But currently have a representation of name identifiers.
 
-```kotlin
+```kt
 // Pat.kt
 sealed interface Pat
 
@@ -166,7 +166,7 @@ maintaining the location between the elements of the AST, are:
 - debugging (in the compiler development)
 - breakpoints (in case of real debugging with something like `nvim-dap` in neovim or even the intellij debugger)
 
-```kotlin
+```kt
 // Location.kt
 data class Location(val start: Position, val end: Position)
 

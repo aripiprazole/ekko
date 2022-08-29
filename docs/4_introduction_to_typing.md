@@ -61,7 +61,7 @@ $$
 
 The $\forall$ represents the type parameters, and after the $.$, is the proper type. This structure can be represented in kotlin with the following classes:
 
-```kotlin
+```kt
 // Typ.kt
 
 // mono τ =
@@ -97,7 +97,7 @@ $$
 
 ...Can be implemented in kotlin as:
 
-```kotlin
+```kt
 // FTV.kt
 fun Env.ftv(): Set<String> = values.flatMap { it.ftv() }.toSet()
 
@@ -118,7 +118,7 @@ $$
 
 ...This unifier, called here as most-general unifier, because the unify function can hold more utility functions, and it can be implemented in `Kotlin` in:
 
-```kotlin
+```kt
 // Unify.kt
 fun mgu(lhs: Typ, rhs: Typ): Subst {
   return when {
@@ -152,7 +152,7 @@ The missing two functions, are `compose`, and `apply`:
 
 And can be implemented in kotlin as:
 
-```kotlin
+```kt
 infix fun Forall.apply(subst: Subst): Forall {
   return Forall(names, typ.apply(subst))
 }

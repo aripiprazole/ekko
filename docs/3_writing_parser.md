@@ -23,14 +23,14 @@ for `antlr-kotlin`.
 
 After setting up the generator, we can create a `.g4` file and start playing with it:
 
-```antlrv4
+```antlr
 grammar Ekko;
 ```
 
 If you want to separate the lexer and the parser, you can create the `EkkoParser.g4` and `EkkoLexer.g4` files, and set
 up the lexer tokens in parser's file with `tokenVocab` option:
 
-```antlrv4
+```antlr
 parser grammmar EkkoParser;
 
 options {
@@ -44,7 +44,7 @@ The lexers that we will be creating will ever be in `screaming snake case` by pa
 more about the lexer rules to implement your
 language [here](https://github.com/antlr/antlr4/blob/master/doc/lexer-rules.md).
 
-```antlrv4
+```antlr
 NEWLINE: ([\r] | [\n])+;
 WS: (' ' | '\t' | NEWLINE)+ -> channel(HIDDEN);
 ```
@@ -52,7 +52,7 @@ WS: (' ' | '\t' | NEWLINE)+ -> channel(HIDDEN);
 We will first of all, define the tokens that are junk and whitespace(in this case, all are whitespace). And now we will
 define the constant tokens:
 
-```antlrv4
+```antlr
 LET: 'let';
 IN: 'in';
 
@@ -68,7 +68,7 @@ Done that, we can think about the "variable" ones, like `identifiers`, `strings`
 to match what
 the user writes, and not check the equality:
 
-```antlrv4
+```antlr
 IDENT: ['a-zA-Z_]['a-zA-Z0-9_]*;
 STRING: '"' (~["\r\n\\] | '\\' ~[\r\n])* '"';
 INT: [0-9]+ ;
@@ -87,7 +87,7 @@ numbers, but can never start with a number. And the string, can interpolate the 
 Parsing can be a hard thing, when you don't have a parser generator, but with ANTLR, you have left recursion and can do
 things very simple for the parser. So let's start with a simple expression:
 
-```antlrv4
+```antlr
 exp: value=IDENT   # EVar
    | value=STRING  # EString
    | value=INT     # EInt
@@ -100,7 +100,7 @@ property that will be generated in the `antlr generated tree`.
 
 We can match more lexer rules in a parser rule, like when adding the `group expression`:
 
-```antlrv4
+```antlr
 exp: value=IDENT             # EVar
    | value=STRING            # EString
    | value=INT               # EInt
@@ -114,7 +114,7 @@ exp: value=IDENT             # EVar
 
 Now we can parse more complex expressions like `applications`(function calls) and `lambdas`:
 
-```antlrv4
+```antlr
 exp: ...
    | lhs=exp rhs=exp               # EApp
    | BAR param=pat ARROW value=exp # EAbs
@@ -123,7 +123,7 @@ exp: ...
 
 And with this pattern, we can implement the `let expression` too, and combine more parser rules:
 
-```antlrv4
+```antlr
 pat: name=IDENT # PVar;
 
 alt: name=IDENT pat* EQ value=exp;
@@ -139,7 +139,7 @@ Debugging the antlr generated tree is hard without mapping, so we can
 use [this snippet](https://github.com/gabrielleeg1/ekko/blob/main/src/main/kotlin/parser/ParseTree.kt) for pretty
 printing a simplified version of the generated parse tree. For example:
 
-```kotlin
+```kt
 val parser: EkkoParser
 
 println(parser.exp().toParseTree().multilineString())
@@ -152,7 +152,7 @@ So we need to map the tree to the AST.
 
 We can start making utilitary functions like:
 
-```kotlin
+```kt
 // parserUtils.kt
 
 fun ParserRuleContext.getLocationIn(file: File): Location {
@@ -176,7 +176,7 @@ fun Token.treeToIdent(file: File): Ident {
 This will make easier to deal with locations when mapping. So we can start by defining a function that
 maps `expressions`:
 
-```kotlin
+```kt
 // treeToExp.kt
 
 // The properties generated with `antlr-kotlin` are always nullable, so we need to coerce that variables that we know
@@ -190,19 +190,16 @@ fun ExpContext.treeToExp(file: File): Exp {
       ELet(names, value, getLocationIn(file))
     }
 
-    is EAppContext -> {
-      val lhs = lhs!!.treeToExp(file)
-      val rhs = rhs!!.treeToExp(file)
-
-      EApp(lhs, rhs, getLocationIn(file))
-    }
-
     is EStringContext -> {
       // We use `.substring()` here, because the lexer includes the " characters at the start and at
       // the end of the string.
       val text = value!!.text!!.substring(1, value!!.text!!.length - 1)
 
       ELit(LString(text, getLocationIn(file)))
+    }
+
+    is EAppContext -> {
+      EApp(lhs!!.treeToExp(file), rhs!!.treeToExp(file), getLocationIn(file))
     }
 
     // ...
@@ -221,7 +218,7 @@ get the new mapped tree.
 With the Kotlin 1.7 update, we can use `context receivers` with a specific compiler flag, and this will make the code
 cleaner like:
 
-```kotlin
+```kt
 context(File)
 fun ParserRuleContext.currentLocation(): Location {
   return Location(Position(start!!.startIndex, this@File), Position(stop!!.stopIndex, this@File))
