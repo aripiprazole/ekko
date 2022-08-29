@@ -12,11 +12,12 @@ learning.
 ## Chapters
 
 - [Writing Haskell in Kotlin](#writing-haskell-in-kotlin)
-  - [Thinking about syntax](2_thinking_about_syntax.md)
-  - [Writing parsers](3_writing_parser.md)
-  - [Introduction for typing](4_introduction_to_typing.md)
-  - [Refactoring type system](5_refactoring_type_system.md)
-  - [Resolving](6_resolving.md)
+  - [Thinking about syntax](1_thinking_about_syntax.md)
+  - [Writing parsers](2_writing_parser.md)
+  - [Introduction for typing](3_introduction_to_typing.md)
+  - [Resolving](4_resolving.md)
+  - [Implementing enums](5_implementing_enums.md)
+  - [Refactoring type system](6_refactoring_type_system.md)
   - [Type classes](7_type_classes.md)
   - [Evaluating](8_evaluating.md)
   - [More content](9_more_content.md)

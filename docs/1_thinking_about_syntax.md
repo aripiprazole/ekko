@@ -99,7 +99,7 @@ Expression in the base of expressions in a programming language, which can be in
 decimals, strings, unit) to function calls(known as `EApp`) and lambdas(that will not be implemented at this moment of
 the article).
 
-```kt
+```kotlin
 // Exp.kt
 sealed interface Exp
 
