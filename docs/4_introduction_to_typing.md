@@ -4,6 +4,15 @@ Typing is an important feature of a programming language, like in `Rust`, and ma
 Our `ekko` language is going to be a `statically typed language`, this means that we can't have dynamic values like in
 `JavaScript`, `Python`, `PHP`.
 
+## Table of content
+
+- [Introduction to Typing](#introduction-to-typing)
+  - [Theory](#theory)
+  - [Hindley Milner](#hindley-milner)
+    - [Expressions](#expressions)
+    - [Types](#types)
+    - [Unification and free variables](#unification-and-free-variables)
+
 ## Theory
 
 Types are kinds of `sets` or `constraints` of possible values, like

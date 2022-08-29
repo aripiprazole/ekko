@@ -9,6 +9,16 @@ use [Strumenta's](https://strumenta.com/) [antlr-kotlin](https://github.com/Stru
 check out [here](https://github.com/gabrielleeg1/ekko/blob/main/build.gradle.kts) project's buildscript configuration
 for `antlr-kotlin`.
 
+## Table of contents
+
+- [Writing parser](#writing-parser)
+  - [Using ANTLR for Grammar](#using-antlr-for-grammar)
+    - [Lexing](#lexing)
+    - [Parsing](#parsing)
+    - [Debugging](#debugging)
+  - [Mapping tree to the AST](#mapping-tree-to-the-ast)
+    - [Notes for mapping](#notes-for-mapping)
+
 ## Using ANTLR for Grammar
 
 After setting up the generator, we can create a `.g4` file and start playing with it:
@@ -105,7 +115,7 @@ exp: value=IDENT             # EVar
 Now we can parse more complex expressions like `applications`(function calls) and `lambdas`:
 
 ```antlrv4
-exp: ... 
+exp: ...
    | lhs=exp rhs=exp               # EApp
    | BAR param=pat ARROW value=exp # EAbs
    ;
@@ -169,7 +179,7 @@ maps `expressions`:
 ```kotlin
 // treeToExp.kt
 
-// The properties generated with `antlr-kotlin` are always nullable, so we need to coerce that variables that we know 
+// The properties generated with `antlr-kotlin` are always nullable, so we need to coerce that variables that we know
 // aren't null.
 fun ExpContext.treeToExp(file: File): Exp {
   return when (this) {

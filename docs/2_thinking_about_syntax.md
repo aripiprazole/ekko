@@ -3,6 +3,15 @@
 Our goal in Ekko project, is having a full haskell-like language, with imports, lambdas, pattern matching, and even type
 classes. And, said that, we need to model our language.
 
+## Table of contents
+
+- [Thinking about Syntax](#thinking-about-syntax)
+  - [Language Features](#language-features)
+  - [Abstract Syntax Tree](#abstract-syntax-tree)
+  - [Location](#location)
+
+## Language features
+
 ```haskell
 data Either a b = Left a | Right b
 
@@ -22,11 +31,11 @@ module Person where
     name : "Carlos",
     age : 19
   }
-  
+
   sayHello : Person -> IO ()
   sayHello (Person name age) =
     println "Hello, I'm $name, and i'm $age years old"
-    
+
   -- or matching:
   -- sayHello : Person -> IO ()
   -- sayHello = \case
@@ -49,7 +58,7 @@ main = do
   traverse $ (\x -> sayHello x) <$> people
   -- or passing the lambda reference
   -- traverse $ sayHello <$> people
-  
+
   println "hello, world"
 ```
 
@@ -152,10 +161,10 @@ data class PVar(val id: Ident) : Pat
 We can add a location data type to the AST, to keep track of the source code location of each element. The importance of
 maintaining the location between the elements of the AST, are:
 
-* readability
-* error handling
-* debugging (in the compiler development)
-* breakpoints (in case of real debugging with something like `nvim-dap` in neovim or even the intellij debugger)
+- readability
+- error handling
+- debugging (in the compiler development)
+- breakpoints (in case of real debugging with something like `nvim-dap` in neovim or even the intellij debugger)
 
 ```kotlin
 // Location.kt
