@@ -87,7 +87,7 @@ Free variables, are variables that aren't bound in any type environment, these v
 
 $$
 \begin{array}{llrll}
-  \text{free}(\alpha)                     &=\ \{ \alpha\ } \\
+  \text{free}(\alpha)                     &=\ \{ \alpha \} \\
   \text{free}(\tau_1\ \tau_2)             &=\ \text{free}(\tau_1)\ +\ \text{free}(\tau_2) \\
   \text{free}(\forall\ \alpha_1\dots\alpha_n\ .\ \sigma) &=\ \text{free}(\sigma)\ -\ \{\alpha_1\dots\alpha_n\}\\
   \text{free}(\Gamma \vdash e\ :\ \sigma) &=\ \text{free}(\sigma)\ -\ \text{free}(\Gamma)\\
