@@ -12,7 +12,7 @@ learning.
 ## Chapters
 
 - [Writing Haskell in Kotlin](#writing-haskell-in-kotlin)
-  - [Thinking about syntax](1_thinking_about_syntax.md)
+  - [Thinking about syntax](1_thinking_in_ekko.md)
   - [Writing parsers](2_writing_parser.md)
   - [Introduction for typing](3_introduction_to_typing.md)
   - [Resolving](4_resolving.md)
