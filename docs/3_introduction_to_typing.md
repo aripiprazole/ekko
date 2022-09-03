@@ -12,6 +12,7 @@ Our `ekko` language is going to be a `statically typed language`, this means tha
     - [Expressions](#expressions)
     - [Types](#types)
     - [Unification and free variables](#unification-and-free-variables)
+    - [Generalization and Instantiation](#generalization-and-instantiation)
 
 ## Theory
 
@@ -169,3 +170,10 @@ infix fun Subst.compose(other: Subst): Subst {
  return plus(other).mapValues { it.value apply this }
 }
 ```
+
+## Generalization and Instantiation
+
+Generalization and instantiation are the core feature of the type inference, that will rule all of the other things.
+
+- generalization: gets the $\alpha_1\dots\alpha_n$ free variables of a $\tau$ and transforms into a scheme of $\forall\ \alpha_1\dots\alpha_n.\ \tau$
+- instantiation: transforms into a $\tau$ a scheme $\sigma$ peeking the existing $\alpha_1\dots\alpha_n$ mapping into new fresh type variables ready to be unified, and thereafter, erased.
