@@ -27,7 +27,7 @@ fun File.highlight(location: Location, buildMessage: () -> Message) {
   val numLength = maxLineNum.length
 
   run {
-    val letter = message.prefix.first()
+    val letter = message.prefix.uppercase().first()
 
     terminal.append {
       append(message.color("%s[%s%02x]: ".format(message.prefix, letter, message.code)))
