@@ -7,6 +7,14 @@ import java.io.File
 class Report(val file: File) {
   private val messages: MutableList<Pair<Location, Message>> = mutableListOf()
 
+  fun isEmpty(): Boolean {
+    return messages.isEmpty()
+  }
+
+  fun isNotEmpty(): Boolean {
+    return messages.isNotEmpty()
+  }
+
   fun addMessage(range: IntRange, buildMessage: () -> Message) {
     val location = Location(Position(range.first, file), Position(range.last, file))
 
