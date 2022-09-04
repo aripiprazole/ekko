@@ -2,7 +2,11 @@ package ekko.parsing.tree
 
 import java.io.File
 
-data class Location(val start: Position, val end: Position)
+data class Location(val start: Position, val end: Position) {
+  fun endIn(location: Location): Location {
+    return copy(end = location.end)
+  }
+}
 
 class Position {
   val line: Int

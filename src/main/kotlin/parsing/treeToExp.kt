@@ -4,6 +4,7 @@ import ekko.parsing.EkkoParser.EAbsContext
 import ekko.parsing.EkkoParser.EAppContext
 import ekko.parsing.EkkoParser.EDecimalContext
 import ekko.parsing.EkkoParser.EGroupContext
+import ekko.parsing.EkkoParser.EInfixContext
 import ekko.parsing.EkkoParser.EIntContext
 import ekko.parsing.EkkoParser.ELetContext
 import ekko.parsing.EkkoParser.EStringContext
@@ -74,6 +75,22 @@ fun ExpContext.treeToExp(file: File): Exp {
       val value = value!!.treeToExp(file)
 
       EAbs(param, value, getLocationIn(file))
+    }
+
+    is EInfixContext -> {
+      val callee = callee!!.treeToIdent(file)
+      val lhs = lhs!!.treeToExp(file)
+      val rhs = rhs!!.treeToExp(file)
+
+      EApp(
+        lhs = EApp(
+          lhs = EVar(id = callee, location = callee.location),
+          rhs = lhs,
+          location = lhs.location.endIn(callee.location),
+        ),
+        rhs = rhs,
+        location = getLocationIn(file),
+      )
     }
 
     else -> throw IllegalArgumentException("Unsupported expression: ${this::class}")

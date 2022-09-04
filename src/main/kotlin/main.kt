@@ -17,10 +17,10 @@ import org.antlr.v4.kotlinruntime.CommonTokenStream
 import org.antlr.v4.kotlinruntime.DiagnosticErrorListener
 
 fun main() {
-  val exp = readExp("""let f x = x, a = f id in a (\x -> x)""")
+  val exp = readExp("1 + 1")
 
   val env = buildMap {
-    put("id", Forall("a") { Typ.variable("a") arrow Typ.variable("a") })
+    put("+", Forall { Typ.Int arrow Typ.Int arrow Typ.Int })
   }
 
   println(Typer().runInfer(exp, env))
