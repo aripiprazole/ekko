@@ -54,6 +54,7 @@ java {
 }
 
 dependencies {
+  implementation("com.github.ajalt.mordant:mordant:2.0.0-beta7")
   implementation("com.strumenta.antlr-kotlin:antlr-kotlin-runtime-jvm:160bc0b70f")
 }
 

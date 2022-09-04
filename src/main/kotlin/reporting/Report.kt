@@ -28,9 +28,7 @@ class Report(val file: File) {
   fun show() {
     messages.forEach { (location, message) ->
       file.highlight(location) {
-        val letter = message.prefix.first()
-
-        "%s[%s%02x]: %s".format(message.prefix, letter, message.code, message.text)
+        message
       }
     }
   }

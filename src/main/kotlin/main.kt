@@ -40,7 +40,7 @@ fun readExp(input: String): Exp {
 }
 
 fun main() {
-  val exp = readExp("""let f x = x, a = f id in a (\x -> x)""")
+  val exp = readExp("""]""")
 
   val env = buildMap {
     put("id", Forall("a") { Typ.variable("a") arrow Typ.variable("a") })
