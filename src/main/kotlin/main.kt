@@ -30,7 +30,7 @@ fun main() {
   val infer = Infer()
 
   val env = buildMap {
-    put("id", Forall(setOf("a"), Typ.variable("a") arrow Typ.variable("a")))
+    put("id", Forall("a") { Typ.variable("a") arrow Typ.variable("a") })
   }
 
   println(infer.tiExp(exp, env))
