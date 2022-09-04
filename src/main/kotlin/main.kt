@@ -16,6 +16,16 @@ import org.antlr.v4.kotlinruntime.CharStreams
 import org.antlr.v4.kotlinruntime.CommonTokenStream
 import org.antlr.v4.kotlinruntime.DiagnosticErrorListener
 
+fun main() {
+  val exp = readExp("""let f x = x, a = f id in a (\x -> x)""")
+
+  val env = buildMap {
+    put("id", Forall("a") { Typ.variable("a") arrow Typ.variable("a") })
+  }
+
+  println(Typer().runInfer(exp, env))
+}
+
 fun readExp(input: String): Exp {
   val path = createTempFile("ekko", ".ekko").apply { writeText(input) }
   val file = path.toFile()
@@ -37,14 +47,4 @@ fun readExp(input: String): Exp {
   }
 
   return tree.treeToExp(file)
-}
-
-fun main() {
-  val exp = readExp("""let f x = x, a = f id in a (\x -> x)""")
-
-  val env = buildMap {
-    put("id", Forall("a") { Typ.variable("a") arrow Typ.variable("a") })
-  }
-
-  println(Typer().runInfer(exp, env))
 }
