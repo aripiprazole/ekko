@@ -2,8 +2,8 @@ package ekko.parsing
 
 import ekko.parsing.EkkoParser.PVarContext
 import ekko.parsing.EkkoParser.PatContext
-import ekko.tree.PVar
-import ekko.tree.Pat
+import ekko.parsing.tree.PVar
+import ekko.parsing.tree.Pat
 import java.io.File
 
 fun PatContext.treeToPat(file: File): Pat {

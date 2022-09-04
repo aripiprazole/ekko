@@ -1,4 +1,4 @@
-package ekko.tree
+package ekko.parsing.tree
 
 data class Alt(
   val id: Ident,

@@ -9,16 +9,16 @@ import ekko.parsing.EkkoParser.ELetContext
 import ekko.parsing.EkkoParser.EStringContext
 import ekko.parsing.EkkoParser.EVarContext
 import ekko.parsing.EkkoParser.ExpContext
-import ekko.tree.EAbs
-import ekko.tree.EApp
-import ekko.tree.EGroup
-import ekko.tree.ELet
-import ekko.tree.ELit
-import ekko.tree.EVar
-import ekko.tree.Exp
-import ekko.tree.LFloat
-import ekko.tree.LInt
-import ekko.tree.LString
+import ekko.parsing.tree.EAbs
+import ekko.parsing.tree.EApp
+import ekko.parsing.tree.EGroup
+import ekko.parsing.tree.ELet
+import ekko.parsing.tree.ELit
+import ekko.parsing.tree.EVar
+import ekko.parsing.tree.Exp
+import ekko.parsing.tree.LFloat
+import ekko.parsing.tree.LInt
+import ekko.parsing.tree.LString
 import java.io.File
 
 fun ExpContext.treeToExp(file: File): Exp {
