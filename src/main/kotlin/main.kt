@@ -20,7 +20,7 @@ fun main() {
   val exp = readExp("(sum 1) 1")
 
   val env = buildMap {
-    put("sum", Forall { Typ.Int arrow Typ.Int arrow Typ.Int })
+    put("sum", Forall { Typ.Int arrow (Typ.Int arrow Typ.Int) })
   }
 
   println(Typer().runInfer(exp, env))
