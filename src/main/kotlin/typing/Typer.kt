@@ -16,7 +16,7 @@ import ekko.parsing.tree.Lit
 import ekko.parsing.tree.PVar
 import ekko.parsing.tree.Pat
 
-class Infer {
+class Typer {
   private var state: Int = 0
 
   fun tiExp(exp: Exp, env: Env = emptyEnv()): Pair<Subst, Typ> {
