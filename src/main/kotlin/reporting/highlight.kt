@@ -8,13 +8,15 @@ import java.io.File
 private val terminal = Terminal()
 
 fun File.highlight(location: Location, buildMessage: () -> Message) {
-  val message = buildMessage()
+  return Highlight(buildMessage(), this, location).printHighlight()
+}
 
+private class Highlight(val message: Message, val file: File, val location: Location) {
   val line = location.start.line - 1
   val start = location.start.column
   val end = location.end.column
 
-  val indexedLines = readLines().mapIndexed(Int::to)
+  val indexedLines = file.readLines().mapIndexed(Int::to)
 
   val lines = when {
     line == 0 && indexedLines.size == 1 -> indexedLines
@@ -26,7 +28,20 @@ fun File.highlight(location: Location, buildMessage: () -> Message) {
   val maxLineNum = lines.maxOfOrNull { it.first }!!.toString()
   val numLength = maxLineNum.length
 
-  run {
+  fun printHighlight() {
+    printMessage(message)
+    printLocation(location)
+
+    lines.forEach { (num, content) ->
+      printLine(num, content)
+
+      if (num == line) {
+        printIndicator(content)
+      }
+    }
+  }
+
+  fun printMessage(message: Message) {
     val letter = message.prefix.uppercase().first()
 
     terminal.append {
@@ -35,31 +50,34 @@ fun File.highlight(location: Location, buildMessage: () -> Message) {
     }
   }
 
-  terminal.append {
-    append(TextColors.gray(" --> "))
-    append("$path:$line:$start")
+  fun printLocation(location: Location) {
+    terminal.append {
+      append(TextColors.gray(" --> "))
+      append("${file.path}:${location.start.line}:${location.start.column}")
+    }
   }
-  lines.forEach { (num, content) ->
+
+  fun printLine(num: Int, content: String) {
     terminal.append {
       append(TextColors.gray(" %${numLength}s | ".format(num)))
       append(content)
     }
+  }
 
-    if (num == line) {
-      val highlight = MutableList(content.length) { " " }.apply {
-        for (j in start..end) {
-          set(j, "^")
-        }
-      }
-
-      terminal.append {
-        append(TextColors.gray(" ${" ".repeat(numLength)} | "))
-        append(highlight.joinToString(""))
+  fun printIndicator(content: String) {
+    val highlight = MutableList(content.length) { " " }.apply {
+      for (j in start..end) {
+        set(j, "^")
       }
     }
-  }
-}
 
-private inline fun Terminal.append(builder: StringBuilder.() -> Unit) {
-  println(buildString(builder))
+    terminal.append {
+      append(TextColors.gray(" ${" ".repeat(numLength)} | "))
+      append(highlight.joinToString(""))
+    }
+  }
+
+  inline fun Terminal.append(builder: StringBuilder.() -> Unit) {
+    println(buildString(builder))
+  }
 }
