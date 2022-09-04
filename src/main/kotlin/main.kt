@@ -17,10 +17,10 @@ import org.antlr.v4.kotlinruntime.CommonTokenStream
 import org.antlr.v4.kotlinruntime.DiagnosticErrorListener
 
 fun main() {
-  val exp = readExp("1 + 1")
+  val exp = readExp("(sum 1) 1")
 
   val env = buildMap {
-    put("+", Forall { Typ.Int arrow Typ.Int arrow Typ.Int })
+    put("sum", Forall { Typ.Int arrow Typ.Int arrow Typ.Int })
   }
 
   println(Typer().runInfer(exp, env))
