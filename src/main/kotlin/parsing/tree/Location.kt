@@ -8,6 +8,11 @@ class Position {
   val line: Int
   val column: Int
 
+  constructor(line: Int, column: Int) {
+    this.line = line
+    this.column = column
+  }
+
   // Note that we suppress `ConvertSecondaryConstructorToPrimary` due to `return` expressions, so we
   // can still have the `line` and `column` properties immutable.
   @Suppress("ConvertSecondaryConstructorToPrimary")
