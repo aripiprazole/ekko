@@ -183,10 +183,10 @@ Generalization and instantiation are the core feature of the type inference, tha
 
 Infer is the core process of a type-system, and with Hindley-Milner/W Algorithm it can be very simple. It consists in basically instantiation type schemes(get fresh types), and unifying.
 
-We can start creating a Infer class, and adding a few items there.
+We can start creating a `Typer` class, and adding a few items there.
 
 ```kotlin
-class Infer {
+class Typer {
   private var state: Int = 0
 }
 ```

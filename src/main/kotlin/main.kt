@@ -7,8 +7,8 @@ import ekko.parsing.tree.Exp
 import ekko.parsing.treeToExp
 import ekko.reporting.Report
 import ekko.typing.Forall
-import ekko.typing.Infer
 import ekko.typing.Typ
+import ekko.typing.Typer
 import ekko.typing.arrow
 import kotlin.io.path.createTempFile
 import kotlin.io.path.writeText
@@ -46,5 +46,5 @@ fun main() {
     put("id", Forall("a") { Typ.variable("a") arrow Typ.variable("a") })
   }
 
-  println(Infer().tiExp(exp, env).second)
+  println(Typer().runInfer(exp, env))
 }
