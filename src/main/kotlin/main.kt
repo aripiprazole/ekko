@@ -46,5 +46,5 @@ fun main() {
     put("id", Forall("a") { Typ.variable("a") arrow Typ.variable("a") })
   }
 
-  println(Typer().tiExp(exp, env).second)
+  println(Typer().runInfer(exp, env))
 }

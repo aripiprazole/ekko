@@ -19,6 +19,10 @@ import ekko.parsing.tree.Pat
 class Typer {
   private var state: Int = 0
 
+  fun runInfer(exp: Exp, env: Env = emptyEnv()): Typ {
+    return tiExp(exp, env).second
+  }
+
   fun tiExp(exp: Exp, env: Env = emptyEnv()): Pair<Subst, Typ> {
     return when (exp) {
       is EGroup -> tiExp(exp.value)
