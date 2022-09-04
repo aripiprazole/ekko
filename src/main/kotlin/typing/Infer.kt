@@ -1,20 +1,20 @@
 package ekko.typing
 
-import ekko.tree.Alt
-import ekko.tree.EAbs
-import ekko.tree.EApp
-import ekko.tree.EGroup
-import ekko.tree.ELet
-import ekko.tree.ELit
-import ekko.tree.EVar
-import ekko.tree.Exp
-import ekko.tree.LFloat
-import ekko.tree.LInt
-import ekko.tree.LString
-import ekko.tree.LUnit
-import ekko.tree.Lit
-import ekko.tree.PVar
-import ekko.tree.Pat
+import ekko.parsing.tree.Alt
+import ekko.parsing.tree.EAbs
+import ekko.parsing.tree.EApp
+import ekko.parsing.tree.EGroup
+import ekko.parsing.tree.ELet
+import ekko.parsing.tree.ELit
+import ekko.parsing.tree.EVar
+import ekko.parsing.tree.Exp
+import ekko.parsing.tree.LFloat
+import ekko.parsing.tree.LInt
+import ekko.parsing.tree.LString
+import ekko.parsing.tree.LUnit
+import ekko.parsing.tree.Lit
+import ekko.parsing.tree.PVar
+import ekko.parsing.tree.Pat
 
 class Infer {
   private var state: Int = 0

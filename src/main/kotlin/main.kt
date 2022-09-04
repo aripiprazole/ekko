@@ -1,9 +1,9 @@
 package ekko
 
-import ekko.parser.EkkoLexer
-import ekko.parser.EkkoParser
-import ekko.parser.treeToExp
-import ekko.tree.Exp
+import ekko.parsing.EkkoLexer
+import ekko.parsing.EkkoParser
+import ekko.parsing.tree.Exp
+import ekko.parsing.treeToExp
 import ekko.typing.Forall
 import ekko.typing.Infer
 import ekko.typing.Typ

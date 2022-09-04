@@ -1,7 +1,7 @@
-package ekko.parser
+package ekko.parsing
 
-import ekko.tree.Location
-import ekko.tree.Position
+import ekko.parsing.tree.Location
+import ekko.parsing.tree.Position
 import java.io.File
 import org.antlr.v4.kotlinruntime.ParserRuleContext
 

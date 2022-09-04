@@ -1,7 +1,7 @@
-package ekko.parser
+package ekko.parsing
 
-import ekko.parser.EkkoParser.AltContext
-import ekko.tree.Alt
+import ekko.parsing.EkkoParser.AltContext
+import ekko.parsing.tree.Alt
 import java.io.File
 
 fun AltContext.treeToAlt(file: File): Alt {

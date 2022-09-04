@@ -1,4 +1,4 @@
-package ekko.tree
+package ekko.parsing.tree
 
 import java.io.File
 

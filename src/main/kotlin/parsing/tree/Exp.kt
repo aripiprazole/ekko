@@ -1,4 +1,4 @@
-package ekko.tree
+package ekko.parsing.tree
 
 sealed interface Exp {
   val location: Location

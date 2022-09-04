@@ -1,24 +1,24 @@
-package ekko.parser
+package ekko.parsing
 
-import ekko.parser.EkkoParser.EAbsContext
-import ekko.parser.EkkoParser.EAppContext
-import ekko.parser.EkkoParser.EDecimalContext
-import ekko.parser.EkkoParser.EGroupContext
-import ekko.parser.EkkoParser.EIntContext
-import ekko.parser.EkkoParser.ELetContext
-import ekko.parser.EkkoParser.EStringContext
-import ekko.parser.EkkoParser.EVarContext
-import ekko.parser.EkkoParser.ExpContext
-import ekko.tree.EAbs
-import ekko.tree.EApp
-import ekko.tree.EGroup
-import ekko.tree.ELet
-import ekko.tree.ELit
-import ekko.tree.EVar
-import ekko.tree.Exp
-import ekko.tree.LFloat
-import ekko.tree.LInt
-import ekko.tree.LString
+import ekko.parsing.EkkoParser.EAbsContext
+import ekko.parsing.EkkoParser.EAppContext
+import ekko.parsing.EkkoParser.EDecimalContext
+import ekko.parsing.EkkoParser.EGroupContext
+import ekko.parsing.EkkoParser.EIntContext
+import ekko.parsing.EkkoParser.ELetContext
+import ekko.parsing.EkkoParser.EStringContext
+import ekko.parsing.EkkoParser.EVarContext
+import ekko.parsing.EkkoParser.ExpContext
+import ekko.parsing.tree.EAbs
+import ekko.parsing.tree.EApp
+import ekko.parsing.tree.EGroup
+import ekko.parsing.tree.ELet
+import ekko.parsing.tree.ELit
+import ekko.parsing.tree.EVar
+import ekko.parsing.tree.Exp
+import ekko.parsing.tree.LFloat
+import ekko.parsing.tree.LInt
+import ekko.parsing.tree.LString
 import java.io.File
 
 fun ExpContext.treeToExp(file: File): Exp {
