@@ -13,6 +13,7 @@ Our `ekko` language is going to be a `statically typed language`, this means tha
     - [Types](#types)
     - [Unification and free variables](#unification-and-free-variables)
     - [Generalization and Instantiation](#generalization-and-instantiation)
+    - [Infer](#infer)
 
 ## Theory
 
@@ -177,3 +178,195 @@ Generalization and instantiation are the core feature of the type inference, tha
 
 - generalization: gets the $\alpha_1\dots\alpha_n$ free variables of a $\tau$ and transforms into a scheme of $\forall\ \alpha_1\dots\alpha_n.\ \tau$
 - instantiation: transforms into a $\tau$ a scheme $\sigma$ peeking the existing $\alpha_1\dots\alpha_n$ mapping into new fresh type variables ready to be unified, and thereafter, erased.
+
+## Infer
+
+Infer is the core process of a type-system, and with Hindley-Milner/W Algorithm it can be very simple. It consists in basically instantiation type schemes(get fresh types), and unifying.
+
+We can start creating a Infer class, and adding a few items there.
+
+```kotlin
+class Infer {
+  private var state: Int = 0
+}
+```
+
+The state consists in the core of fresh variables, this will let we know in what stage of type inference, the instantiation is. Now we need to create an utility function to get fresh variables throughout the `state`. For that we will use letters for better readability when debugging:
+
+```kotlin
+val letters: Sequence<String> = sequence {
+  var prefix = ""
+  var i = 0
+  while (true) {
+    i++
+    for (c in 'a'..'z') {
+      yield("$prefix$c")
+    }
+    if (i > Char.MAX_VALUE.code) i = 0
+    prefix += "${i.toChar()}"
+  }
+}
+```
+
+...The letter sequence is a lazy list that enumerates from `a, b, c ...`, and when this finish, it will be combining the letters: `aa, ba, ca, ...`.
+
+```kotlin
+fun fresh(): Typ = TVar(letters.elementAt(++state))
+```
+
+Now, with the `fresh` function, we can start the type inference process.
+
+```kotlin
+fun tiLit(lit: Lit): Typ {
+  return when (lit) {
+    is LInt -> Typ.Int
+    is LFloat -> Typ.Float
+    is LString -> Typ.String
+    is LUnit -> Typ.Unit
+  }
+}
+```
+
+We can start with `tiLit`, that will type the constants, and for starting the `tiExp` function, we need to write the environment class:
+
+```kotlin
+// Env.kt
+typealias Env = Map<String, Forall>
+
+fun emptyEnv(): Env = emptyMap()
+
+fun envOf(vararg pairs: Pair<String, Forall>): Env = mapOf(pairs = pairs)
+
+fun Env.ftv(): Set<String> = values.flatMap { it.ftv() }.toSet()
+
+fun Env.extendEnv(vararg pairs: Pair<String, Forall>): Env {
+  return this + envOf(pairs = pairs)
+}
+
+fun Env.apply(subst: Subst): Env {
+  return mapValues { it.value.apply(subst) }
+}
+```
+
+We use a type alias, to be easier to iterate without re-implementing all of them.
+
+```kotlin
+fun tiExp(exp: Exp, env: Env = emptyEnv()): Pair<Subst, Typ> {
+  return when (exp) {
+    is EGroup -> tiExp(exp.value)
+
+    is ELit -> emptySubst() to tiLit(exp.lit)
+
+    is EVar -> {
+      val scheme = env[exp.id.name] ?: throw InferException("unbound variable: ${exp.id}")
+
+      emptySubst() to inst(scheme)
+    }
+
+    is EApp -> { ... }
+
+    is EAbs -> { ... }
+
+    is ELet -> { ... }
+  }
+}
+```
+
+The base implementation is quite simple, because it is just using the utility functions previously created. For the `EApp`, and `ELet`, we will need to unify the values to get the inferred type:
+
+```kotlin
+val tv = fresh() // this is the return type
+val (s1, t1) = tiExp(exp.lhs, env)
+val (s2, t2) = tiExp(exp.rhs, env apply s1)
+
+val s3 = mgu(t1, t2 arrow tv)
+
+(s3 compose s2 compose s1) to (tv apply s3)
+```
+
+> Note that we can cast the `t1` to `TApp`, but it would be so much hard because the `->` type isn't a variant of `Typ`, so we would need to deconstruct `t1`, and it will miss the validation part, that is essential for a good compiler. The `mgu` takes care of the _logical equation_ and the _validation_.
+
+For `EApp`, we have to isolate the $tv$ in the returned $t1$, and composes all of substitutions to make sure all of free variables are properly unified. The logic can be seen as:
+
+$$
+\begin{array}{llrll}
+  \text{mgu}(\Gamma,\ \tau_1 \rightarrow \tau_2,\ \tau_1 \rightarrow \alpha) = \{\alpha \mapsto \tau_2\}
+\end{array}
+$$
+
+If $\tau_1 = \text{t2}$, and $\alpha = \text{tv}$, we get the $\tau_2 = \alpha$ after applying the substitutions.
+
+Now for the `ELet` expression, we will need to write a type inference function for the patterns/parameters:
+
+```kotlin
+fun tiPat(pat: Pat, env: Env): Pair<Typ, Env> {
+  return when (pat) {
+    is PVar -> {
+      val typ = fresh()
+
+      typ to env.extendEnv(pat.id.name to Forall(emptySet(), typ))
+    }
+  }
+}
+```
+
+This function is quite different, because it returns a pair of `(Typ, Env)`, the first one is going to be the type of the necessary to match the parameter or a subject in case of a match expression, and the second element is going to be the environment when successfully match the requisites.
+
+With the `tiPat` function we can start the `tiAlt`, that will be essential for writing the `ELet` expression inference, as the alternatives are the base construct of a _let expression_.
+
+```kotlin
+fun tiAlt(alt: Alt, env: Env): Pair<Subst, Typ> {
+  val parameters = mutableListOf<Typ>()
+  val newEnv = env.toMutableMap() // This can be read as the function environment
+
+  // We can use a fold function to maintain this pure, but it would decrease the function's readability
+  // This basically will infer the patterns match in the parameters using the `tiPat`
+  for (pat in alt.patterns) {
+    val (typ, currentEnv) = tiPat(pat, newEnv)
+
+    parameters += typ
+    newEnv += currentEnv
+  }
+
+  // Now we have to match the "function" body with the "function's environment"
+  val (subst, typ) = tiExp(alt.exp, newEnv)
+
+  // Folding the [parameters] list will create the required type of a binding.
+  return subst to parameters.fold(typ) { acc, next ->
+    next arrow acc
+  }
+}
+```
+
+Now, with both of the functions wrote, we can type the inference for the `ELet` expression:
+
+```kotlin
+var newSubst = emptySubst()
+var newEnv = env.toMap()
+
+// Again, we can use a pure function like `fold`, but would be harder to read as we are using Kotlin
+for (alt in exp.bindings.values) {
+  val (subst, typ) = tiAlt(alt, newEnv)
+
+  newSubst = newSubst compose subst
+
+  // The logic is quite the same, but we need to generalize, to create type schemes, because they are going to be read in `EVar` expression.
+  newEnv = newEnv.extendEnv(alt.id.name to generalize(typ, newEnv))
+}
+
+val (subst, typ) = tiExp(exp.value, newEnv)
+
+// Finally we can compose the substitutions and return the type.
+(subst compose newSubst) to typ
+```
+
+With those concepts of writing the _let expression_ and the _application expression_, we can write the _lambda/abstraction expression_, that is our `EAbs`:
+
+```kotlin
+val (tv, newEnv) = tiPat(exp.param, env)
+val (subst, typ) = tiExp(exp.value, newEnv)
+
+subst to ((tv arrow typ) apply subst)
+```
+
+This is quite similar to the `tiAlt`, because is the same logic, but with a single parameter.
