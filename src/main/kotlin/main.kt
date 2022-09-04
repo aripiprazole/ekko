@@ -1,8 +1,8 @@
 package ekko
 
-import ekko.parser.EkkoLexer
-import ekko.parser.EkkoParser
-import ekko.parser.treeToExp
+import ekko.parsing.EkkoLexer
+import ekko.parsing.EkkoParser
+import ekko.parsing.treeToExp
 import ekko.tree.Exp
 import ekko.typing.Forall
 import ekko.typing.Infer

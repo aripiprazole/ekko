@@ -63,7 +63,7 @@ val generateMainAntlrSource by tasks.creating(AntlrKotlinTask::class) {
     project.dependencies.create("com.strumenta.antlr-kotlin:antlr-kotlin-target:160bc0b70f"),
   )
   maxHeapSize = "64m"
-  arguments = listOf("-package", "ekko.parser")
+  arguments = listOf("-package", "ekko.parsing")
   source = project.objects
     .sourceDirectorySet("antlr", "antlr")
     .srcDir("src/main/antlr").apply {

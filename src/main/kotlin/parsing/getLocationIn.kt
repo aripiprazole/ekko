@@ -1,4 +1,4 @@
-package ekko.parser
+package ekko.parsing
 
 import ekko.tree.Location
 import ekko.tree.Position

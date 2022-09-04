@@ -1,4 +1,4 @@
-package ekko.parser
+package ekko.parsing
 
 import org.antlr.v4.kotlinruntime.ParserRuleContext
 import org.antlr.v4.kotlinruntime.tree.TerminalNode
