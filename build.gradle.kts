@@ -70,12 +70,8 @@ tasks {
     useJUnitPlatform()
   }
 
-  compileJava {
-    dependsOn(generateParserSource)
-  }
-
   withType<KotlinCompile> {
-    dependsOn(compileJava)
+    dependsOn(generateParserSource)
     kotlinOptions.jvmTarget = "1.8"
   }
 }
