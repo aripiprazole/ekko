@@ -24,7 +24,7 @@ class Typer {
         emptySubst() to inst(scheme)
       }
 
-      is Expression.App -> {
+      is Expression.Application -> {
         val tv = fresh()
         val (s1, t1) = tiExpression(expression.lhs, env)
         val (s2, t2) = tiExpression(expression.rhs, env.apply(s1))

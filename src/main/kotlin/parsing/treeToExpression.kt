@@ -27,7 +27,7 @@ fun ExpContext.treeToExp(file: File): Expression {
       val lhs = lhs.treeToExp(file)
       val rhs = rhs.treeToExp(file)
 
-      Expression.App(lhs, rhs, getLocationIn(file))
+      Expression.Application(lhs, rhs, getLocationIn(file))
     }
 
     is EVarContext -> {
@@ -74,8 +74,8 @@ fun ExpContext.treeToExp(file: File): Expression {
       val lhs = lhs.treeToExp(file)
       val rhs = rhs.treeToExp(file)
 
-      Expression.App(
-        lhs = Expression.App(
+      Expression.Application(
+        lhs = Expression.Application(
           lhs = Expression.Variable(id = callee, location = callee.location),
           rhs = lhs,
           location = lhs.location.endIn(callee.location),
