@@ -59,15 +59,19 @@ tasks {
     outputDirectory = antlrOutputDirectory.resolve("temp")
   }
 
-  test {
-    useJUnitPlatform()
-  }
-
   val generateParserSource by creating(Copy::class) {
     from(generateGrammarSource)
     into(mainAntlrOutputDirectory.resolve(PACKAGE_FILE_HEADER))
     include("**/*.java")
     filter<AntlrPackagingTask>()
+  }
+
+  test {
+    useJUnitPlatform()
+  }
+
+  compileJava {
+    dependsOn(generateParserSource)
   }
 
   withType<KotlinCompile> {
