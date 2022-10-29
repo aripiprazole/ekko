@@ -5,7 +5,7 @@ import ekko.parsing.tree.Lit as AstLit
 sealed interface Expression {
   val location: Location
 
-  data class Lit(val lit: AstLit, override val location: Location = lit.location) : Expression
+  data class Literal(val lit: AstLit, override val location: Location = lit.location) : Expression
 
   data class Variable(val id: Ident, override val location: Location) : Expression
 

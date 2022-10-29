@@ -47,19 +47,19 @@ fun ExpContext.treeToExp(file: File): Expression {
       // the end of the string.
       val text = value.text.substring(1, value.text.length - 1)
 
-      Expression.Lit(Lit.String(text, getLocationIn(file)))
+      Expression.Literal(Lit.String(text, getLocationIn(file)))
     }
 
     is EDecimalContext -> {
       val float = value.text.toFloat()
 
-      Expression.Lit(Lit.Float(float, getLocationIn(file)))
+      Expression.Literal(Lit.Float(float, getLocationIn(file)))
     }
 
     is EIntContext -> {
       val int = value.text.toInt()
 
-      Expression.Lit(Lit.Int(int, getLocationIn(file)))
+      Expression.Literal(Lit.Int(int, getLocationIn(file)))
     }
 
     is EAbsContext -> {

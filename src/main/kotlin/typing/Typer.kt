@@ -15,7 +15,7 @@ class Typer {
   fun tiExpression(expression: Expression, env: Env = emptyEnv()): Pair<Subst, Typ> {
     return when (expression) {
       is Expression.Group -> tiExpression(expression.value, env)
-      is Expression.Lit -> emptySubst() to tiLit(expression.lit)
+      is Expression.Literal -> emptySubst() to tiLit(expression.lit)
 
       is Expression.Variable -> {
         val scheme = env[expression.id.name]
