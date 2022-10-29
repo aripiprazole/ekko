@@ -20,7 +20,7 @@ fun InfixIdentContext.treeToIdent(file: File): Ident {
 
 fun Token.treeToIdent(file: File): Ident {
   return Ident(
-    text!!,
+    text,
     location = Location(
       start = Position(startIndex, file),
       end = Position(stopIndex, file),
