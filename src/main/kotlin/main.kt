@@ -17,7 +17,7 @@ import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.DiagnosticErrorListener
 
 fun main() {
-  val exp = readExp("(sum 1) 1")
+  val exp = readExp("1 >+ 2")
 
   val env = buildMap {
     put("sum", Forall { Typ.Int arrow (Typ.Int arrow Typ.Int) })

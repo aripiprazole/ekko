@@ -6,6 +6,11 @@ WS: (' ' | '\t' | NEWLINE)+ -> channel(HIDDEN);
 LET: 'let';
 IN: 'in';
 
+// The order that the rules are listed in the grammar is important.
+// if it is not listed in the order of precedence, the parser will
+// not work correctly.
+SYMBOL: SUM | SUB | TIMES | DIV | EQ | GT | LT | TURNED_A | INTERROGATION | AT | CIRCUMFLEX | EXCLAMATION | SIGN;
+
 LPAREN: '(';
 RPAREN: ')';
 EQ: '=';
@@ -16,7 +21,6 @@ GT: '>';
 LT: '<';
 
 // symbols
-SYMBOL: SUM | SUB | TIMES | DIV | EQ | GT | LT | TURNED_A | INTERROGATION | AT | CIRCUMFLEX | EXCLAMATION | SIGN;
 TURNED_A: '∀';
 AT: '@';
 AMPERSAND: '&';
