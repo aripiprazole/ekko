@@ -1,6 +1,6 @@
 package ekko.parsing.tree
 
-data class Alt(
+data class Alternative(
   val id: Ident,
   val patterns: List<Pat>,
   val exp: Exp,

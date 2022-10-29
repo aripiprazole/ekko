@@ -17,7 +17,7 @@ import java.io.File
 fun ExpContext.treeToExp(file: File): Exp {
   return when (this) {
     is ELetContext -> {
-      val names = alt().map { it.treeToAlt(file) }.associateBy { it.id }
+      val names = alt().map { it.treeToAlternative(file) }.associateBy { it.id }
       val value = value.treeToExp(file)
 
       Exp.Let(names, value, getLocationIn(file))

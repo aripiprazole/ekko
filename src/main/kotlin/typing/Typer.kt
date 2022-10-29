@@ -1,6 +1,6 @@
 package ekko.typing
 
-import ekko.parsing.tree.Alt
+import ekko.parsing.tree.Alternative
 import ekko.parsing.tree.Exp
 import ekko.parsing.tree.Lit
 import ekko.parsing.tree.Pat
@@ -45,7 +45,7 @@ class Typer {
         var newEnv = env.toMap()
 
         for (alt in exp.bindings.values) {
-          val (subst, typ) = tiAlt(alt, newEnv)
+          val (subst, typ) = tiAlternative(alt, newEnv)
 
           newSubst = newSubst compose subst
           newEnv = newEnv.extendEnv(alt.id.name to generalize(typ, newEnv))
@@ -58,18 +58,18 @@ class Typer {
     }
   }
 
-  fun tiAlt(alt: Alt, env: Env): Pair<Subst, Typ> {
+  fun tiAlternative(alternative: Alternative, env: Env): Pair<Subst, Typ> {
     val parameters = mutableListOf<Typ>()
     val newEnv = env.toMutableMap()
 
-    for (pat in alt.patterns) {
+    for (pat in alternative.patterns) {
       val (typ, currentEnv) = tiPat(pat, newEnv)
 
       parameters += typ
       newEnv += currentEnv
     }
 
-    val (subst, typ) = tiExp(alt.exp, newEnv)
+    val (subst, typ) = tiExp(alternative.exp, newEnv)
 
     return subst to parameters.fold(typ) { acc, next ->
       next arrow acc

@@ -16,7 +16,7 @@ sealed interface Exp {
   data class Group(val value: Exp, override val location: Location) : Exp
 
   data class Let(
-    val bindings: Map<Ident, Alt>,
+    val bindings: Map<Ident, Alternative>,
     val value: Exp,
     override val location: Location,
   ) : Exp
