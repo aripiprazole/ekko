@@ -10,7 +10,7 @@ fun PatContext.treeToPat(file: File): Pat {
     is PVarContext -> {
       val name = name.treeToIdent(file)
 
-      Pat.Var(name, getLocationIn(file))
+      Pat.Variable(name, getLocationIn(file))
     }
 
     else -> throw IllegalArgumentException("Unsupported pattern: ${this::class}")

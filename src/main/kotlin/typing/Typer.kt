@@ -79,7 +79,7 @@ class Typer {
 
   fun tiPat(pat: Pat, env: Env): Pair<Typ, Env> {
     return when (pat) {
-      is Pat.Var -> {
+      is Pat.Variable -> {
         val typ = fresh()
 
         typ to env.extendEnv(pat.id.name to Forall(emptySet(), typ))
