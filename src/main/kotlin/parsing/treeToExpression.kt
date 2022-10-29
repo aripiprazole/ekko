@@ -10,36 +10,36 @@ import ekko.parsing.EkkoParser.ELetContext
 import ekko.parsing.EkkoParser.EStringContext
 import ekko.parsing.EkkoParser.EVarContext
 import ekko.parsing.EkkoParser.ExpContext
-import ekko.parsing.tree.Exp
+import ekko.parsing.tree.Expression
 import ekko.parsing.tree.Lit
 import java.io.File
 
-fun ExpContext.treeToExp(file: File): Exp {
+fun ExpContext.treeToExp(file: File): Expression {
   return when (this) {
     is ELetContext -> {
       val names = alt().map { it.treeToAlternative(file) }.associateBy { it.id }
       val value = value.treeToExp(file)
 
-      Exp.Let(names, value, getLocationIn(file))
+      Expression.Let(names, value, getLocationIn(file))
     }
 
     is EAppContext -> {
       val lhs = lhs.treeToExp(file)
       val rhs = rhs.treeToExp(file)
 
-      Exp.App(lhs, rhs, getLocationIn(file))
+      Expression.App(lhs, rhs, getLocationIn(file))
     }
 
     is EVarContext -> {
       val ident = value.treeToIdent(file)
 
-      Exp.Variable(ident, getLocationIn(file))
+      Expression.Variable(ident, getLocationIn(file))
     }
 
     is EGroupContext -> {
       val value = value.treeToExp(file)
 
-      Exp.Group(value, getLocationIn(file))
+      Expression.Group(value, getLocationIn(file))
     }
 
     is EStringContext -> {
@@ -47,26 +47,26 @@ fun ExpContext.treeToExp(file: File): Exp {
       // the end of the string.
       val text = value.text.substring(1, value.text.length - 1)
 
-      Exp.Lit(Lit.String(text, getLocationIn(file)))
+      Expression.Lit(Lit.String(text, getLocationIn(file)))
     }
 
     is EDecimalContext -> {
       val float = value.text.toFloat()
 
-      Exp.Lit(Lit.Float(float, getLocationIn(file)))
+      Expression.Lit(Lit.Float(float, getLocationIn(file)))
     }
 
     is EIntContext -> {
       val int = value.text.toInt()
 
-      Exp.Lit(Lit.Int(int, getLocationIn(file)))
+      Expression.Lit(Lit.Int(int, getLocationIn(file)))
     }
 
     is EAbsContext -> {
       val param = param.treeToPat(file)
       val value = value.treeToExp(file)
 
-      Exp.Abs(param, value, getLocationIn(file))
+      Expression.Abs(param, value, getLocationIn(file))
     }
 
     is EInfixContext -> {
@@ -74,9 +74,9 @@ fun ExpContext.treeToExp(file: File): Exp {
       val lhs = lhs.treeToExp(file)
       val rhs = rhs.treeToExp(file)
 
-      Exp.App(
-        lhs = Exp.App(
-          lhs = Exp.Variable(id = callee, location = callee.location),
+      Expression.App(
+        lhs = Expression.App(
+          lhs = Expression.Variable(id = callee, location = callee.location),
           rhs = lhs,
           location = lhs.location.endIn(callee.location),
         ),

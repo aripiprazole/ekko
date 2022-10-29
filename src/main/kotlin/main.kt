@@ -3,7 +3,7 @@ package ekko
 import ekko.parsing.EkkoLexer
 import ekko.parsing.EkkoParser
 import ekko.parsing.errors.SyntaxErrorListener
-import ekko.parsing.tree.Exp
+import ekko.parsing.tree.Expression
 import ekko.parsing.treeToExp
 import ekko.reporting.Report
 import ekko.typing.Forall
@@ -26,7 +26,7 @@ fun main() {
   println(Typer().runInfer(exp, env))
 }
 
-fun readExp(input: String): Exp {
+fun readExp(input: String): Expression {
   val path = createTempFile("ekko", ".ekko").apply { writeText(input) }
   val file = path.toFile()
 

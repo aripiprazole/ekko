@@ -1,57 +1,58 @@
 package ekko.typing
 
 import ekko.parsing.tree.Alternative
-import ekko.parsing.tree.Exp
+import ekko.parsing.tree.Expression
 import ekko.parsing.tree.Lit
 import ekko.parsing.tree.Pat
 
 class Typer {
   private var state: Int = 0
 
-  fun runInfer(exp: Exp, env: Env = emptyEnv()): Typ {
-    return tiExp(exp, env).second
+  fun runInfer(expression: Expression, env: Env = emptyEnv()): Typ {
+    return tiExpression(expression, env).second
   }
 
-  fun tiExp(exp: Exp, env: Env = emptyEnv()): Pair<Subst, Typ> {
-    return when (exp) {
-      is Exp.Group -> tiExp(exp.value, env)
-      is Exp.Lit -> emptySubst() to tiLit(exp.lit)
+  fun tiExpression(expression: Expression, env: Env = emptyEnv()): Pair<Subst, Typ> {
+    return when (expression) {
+      is Expression.Group -> tiExpression(expression.value, env)
+      is Expression.Lit -> emptySubst() to tiLit(expression.lit)
 
-      is Exp.Variable -> {
-        val scheme = env[exp.id.name] ?: throw InferException("unbound variable: ${exp.id}")
+      is Expression.Variable -> {
+        val scheme = env[expression.id.name]
+          ?: throw InferException("unbound variable: ${expression.id}")
 
         emptySubst() to inst(scheme)
       }
 
-      is Exp.App -> {
+      is Expression.App -> {
         val tv = fresh()
-        val (s1, t1) = tiExp(exp.lhs, env)
-        val (s2, t2) = tiExp(exp.rhs, env.apply(s1))
+        val (s1, t1) = tiExpression(expression.lhs, env)
+        val (s2, t2) = tiExpression(expression.rhs, env.apply(s1))
 
         val s3 = mgu(t1, t2 arrow tv)
 
         (s3 compose s2 compose s1) to (tv apply s3)
       }
 
-      is Exp.Abs -> {
-        val (tv, newEnv) = tiPat(exp.param, env)
-        val (subst, typ) = tiExp(exp.value, newEnv)
+      is Expression.Abs -> {
+        val (tv, newEnv) = tiPat(expression.param, env)
+        val (subst, typ) = tiExpression(expression.value, newEnv)
 
         subst to ((tv arrow typ) apply subst)
       }
 
-      is Exp.Let -> {
+      is Expression.Let -> {
         var newSubst = emptySubst()
         var newEnv = env.toMap()
 
-        for (alt in exp.bindings.values) {
+        for (alt in expression.bindings.values) {
           val (subst, typ) = tiAlternative(alt, newEnv)
 
           newSubst = newSubst compose subst
           newEnv = newEnv.extendEnv(alt.id.name to generalize(typ, newEnv))
         }
 
-        val (subst, typ) = tiExp(exp.value, newEnv)
+        val (subst, typ) = tiExpression(expression.value, newEnv)
 
         (subst compose newSubst) to typ
       }
@@ -69,7 +70,7 @@ class Typer {
       newEnv += currentEnv
     }
 
-    val (subst, typ) = tiExp(alternative.exp, newEnv)
+    val (subst, typ) = tiExpression(alternative.expression, newEnv)
 
     return subst to parameters.fold(typ) { acc, next ->
       next arrow acc
