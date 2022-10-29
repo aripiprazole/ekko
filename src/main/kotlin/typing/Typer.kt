@@ -15,16 +15,16 @@ class Typer {
   fun tiExpression(
     expression: Expression,
     environment: Environment = emptyEnvironment(),
-  ): Pair<Subst, Typ> {
+  ): Pair<Substitution, Typ> {
     return when (expression) {
       is Expression.Group -> tiExpression(expression.value, environment)
-      is Expression.Literal -> emptySubst() to tiLiteral(expression.literal)
+      is Expression.Literal -> emptySubstitution() to tiLiteral(expression.literal)
 
       is Expression.Variable -> {
         val scheme = environment[expression.id.name]
           ?: throw InferException("unbound variable: ${expression.id}")
 
-        emptySubst() to inst(scheme)
+        emptySubstitution() to inst(scheme)
       }
 
       is Expression.Application -> {
@@ -45,7 +45,7 @@ class Typer {
       }
 
       is Expression.Let -> {
-        var newSubst = emptySubst()
+        var newSubst = emptySubstitution()
         var newEnv = environment.toMap()
 
         for (alt in expression.bindings.values) {
@@ -62,7 +62,7 @@ class Typer {
     }
   }
 
-  fun tiAlternative(alternative: Alternative, environment: Environment): Pair<Subst, Typ> {
+  fun tiAlternative(alternative: Alternative, environment: Environment): Pair<Substitution, Typ> {
     val parameters = mutableListOf<Typ>()
     val newEnv = environment.toMutableMap()
 
@@ -111,9 +111,9 @@ class Typer {
     return scheme.typ apply subst
   }
 
-  private fun mgu(lhs: Typ, rhs: Typ): Subst {
+  private fun mgu(lhs: Typ, rhs: Typ): Substitution {
     return when {
-      lhs == rhs -> emptySubst()
+      lhs == rhs -> emptySubstitution()
       lhs is VarTyp -> lhs bind rhs
       rhs is VarTyp -> rhs bind lhs
       lhs is AppTyp && rhs is AppTyp -> {
@@ -127,8 +127,8 @@ class Typer {
     }
   }
 
-  private infix fun VarTyp.bind(other: Typ): Subst = when {
-    this == other -> emptySubst()
+  private infix fun VarTyp.bind(other: Typ): Substitution = when {
+    this == other -> emptySubstitution()
     id in other.ftv() -> throw InferException("infinite type $id in $other")
     else -> substOf(id to other)
   }

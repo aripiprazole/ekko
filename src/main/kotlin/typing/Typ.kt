@@ -35,7 +35,7 @@ fun Typ.ftv(): Set<String> = when (this) {
   is AppTyp -> lhs.ftv() + rhs.ftv()
 }
 
-infix fun Typ.apply(subst: Subst): Typ {
+infix fun Typ.apply(subst: Substitution): Typ {
   return when (this) {
     is AppTyp -> copy(lhs = lhs apply subst, rhs = rhs apply subst)
     is ConstructorTyp -> this

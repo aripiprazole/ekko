@@ -9,7 +9,7 @@ data class Forall(val names: Set<String>, val typ: Typ) {
   }
 }
 
-fun Forall.apply(subst: Subst): Forall {
+fun Forall.apply(subst: Substitution): Forall {
   return Forall(names, typ.apply(subst))
 }
 

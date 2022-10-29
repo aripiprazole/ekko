@@ -12,6 +12,6 @@ fun Environment.extendEnv(vararg pairs: Pair<String, Forall>): Environment {
   return this + environmentOf(pairs = pairs)
 }
 
-fun Environment.apply(subst: Subst): Environment {
+fun Environment.apply(subst: Substitution): Environment {
   return mapValues { it.value.apply(subst) }
 }
