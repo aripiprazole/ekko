@@ -3,7 +3,7 @@ package ekko.typing
 import ekko.parsing.tree.Alternative
 import ekko.parsing.tree.Expression
 import ekko.parsing.tree.Literal
-import ekko.parsing.tree.Pat
+import ekko.parsing.tree.Pattern
 
 class Typer {
   private var state: Int = 0
@@ -35,7 +35,7 @@ class Typer {
       }
 
       is Expression.Abstraction -> {
-        val (tv, newEnv) = tiPat(expression.parameter, env)
+        val (tv, newEnv) = tiPattern(expression.parameter, env)
         val (subst, typ) = tiExpression(expression.value, newEnv)
 
         subst to ((tv arrow typ) apply subst)
@@ -64,7 +64,7 @@ class Typer {
     val newEnv = env.toMutableMap()
 
     for (pat in alternative.patterns) {
-      val (typ, currentEnv) = tiPat(pat, newEnv)
+      val (typ, currentEnv) = tiPattern(pat, newEnv)
 
       parameters += typ
       newEnv += currentEnv
@@ -77,12 +77,12 @@ class Typer {
     }
   }
 
-  fun tiPat(pat: Pat, env: Env): Pair<Typ, Env> {
-    return when (pat) {
-      is Pat.Variable -> {
+  fun tiPattern(pattern: Pattern, env: Env): Pair<Typ, Env> {
+    return when (pattern) {
+      is Pattern.Variable -> {
         val typ = fresh()
 
-        typ to env.extendEnv(pat.id.name to Forall(emptySet(), typ))
+        typ to env.extendEnv(pattern.id.name to Forall(emptySet(), typ))
       }
     }
   }

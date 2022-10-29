@@ -13,7 +13,7 @@ sealed interface Expression {
   data class Group(val value: Expression, override val location: Location) : Expression
 
   data class Abstraction(
-    val parameter: Pat,
+    val parameter: Pattern,
     val value: Expression,
     override val location: Location,
   ) : Expression

@@ -6,7 +6,7 @@ import java.io.File
 
 fun AltContext.treeToAlternative(file: File): Alternative {
   val name = name.treeToIdent(file)
-  val pattern = pat().map { it.treeToPat(file) }
+  val pattern = pat().map { it.treeToPattern(file) }
   val value = value.treeToExp(file)
 
   return Alternative(name, pattern, value, getLocationIn(file))
