@@ -2,7 +2,7 @@ package ekko.typing
 
 import ekko.parsing.tree.Alternative
 import ekko.parsing.tree.Expression
-import ekko.parsing.tree.Lit
+import ekko.parsing.tree.Literal
 import ekko.parsing.tree.Pat
 
 class Typer {
@@ -15,7 +15,7 @@ class Typer {
   fun tiExpression(expression: Expression, env: Env = emptyEnv()): Pair<Subst, Typ> {
     return when (expression) {
       is Expression.Group -> tiExpression(expression.value, env)
-      is Expression.Literal -> emptySubst() to tiLit(expression.lit)
+      is Expression.Literal -> emptySubst() to tiLiteral(expression.lit)
 
       is Expression.Variable -> {
         val scheme = env[expression.id.name]
@@ -87,12 +87,12 @@ class Typer {
     }
   }
 
-  fun tiLit(lit: Lit): Typ {
-    return when (lit) {
-      is Lit.Int -> Typ.Int
-      is Lit.Float -> Typ.Float
-      is Lit.String -> Typ.String
-      is Lit.Unit -> Typ.Unit
+  fun tiLiteral(literal: Literal): Typ {
+    return when (literal) {
+      is Literal.Int -> Typ.Int
+      is Literal.Float -> Typ.Float
+      is Literal.String -> Typ.String
+      is Literal.Unit -> Typ.Unit
     }
   }
 

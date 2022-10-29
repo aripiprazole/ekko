@@ -1,11 +1,11 @@
 package ekko.parsing.tree
 
-import ekko.parsing.tree.Lit as AstLit
+import ekko.parsing.tree.Literal as AstLiteral
 
 sealed interface Expression {
   val location: Location
 
-  data class Literal(val lit: AstLit, override val location: Location = lit.location) : Expression
+  data class Literal(val lit: AstLiteral, override val location: Location = lit.location) : Expression
 
   data class Variable(val id: Ident, override val location: Location) : Expression
 

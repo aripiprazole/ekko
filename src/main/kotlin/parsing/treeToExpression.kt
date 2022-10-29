@@ -11,7 +11,7 @@ import ekko.parsing.EkkoParser.EStringContext
 import ekko.parsing.EkkoParser.EVarContext
 import ekko.parsing.EkkoParser.ExpContext
 import ekko.parsing.tree.Expression
-import ekko.parsing.tree.Lit
+import ekko.parsing.tree.Literal
 import java.io.File
 
 fun ExpContext.treeToExp(file: File): Expression {
@@ -47,19 +47,19 @@ fun ExpContext.treeToExp(file: File): Expression {
       // the end of the string.
       val text = value.text.substring(1, value.text.length - 1)
 
-      Expression.Literal(Lit.String(text, getLocationIn(file)))
+      Expression.Literal(Literal.String(text, getLocationIn(file)))
     }
 
     is EDecimalContext -> {
       val float = value.text.toFloat()
 
-      Expression.Literal(Lit.Float(float, getLocationIn(file)))
+      Expression.Literal(Literal.Float(float, getLocationIn(file)))
     }
 
     is EIntContext -> {
       val int = value.text.toInt()
 
-      Expression.Literal(Lit.Int(int, getLocationIn(file)))
+      Expression.Literal(Literal.Int(int, getLocationIn(file)))
     }
 
     is EAbsContext -> {
