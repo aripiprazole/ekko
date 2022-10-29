@@ -5,7 +5,7 @@ import ekko.parsing.tree.Literal as AstLiteral
 sealed interface Expression {
   val location: Location
 
-  data class Literal(val lit: AstLiteral, override val location: Location = lit.location) :
+  data class Literal(val literal: AstLiteral, override val location: Location = literal.location) :
     Expression
 
   data class Variable(val id: Ident, override val location: Location) : Expression
@@ -13,7 +13,7 @@ sealed interface Expression {
   data class Group(val value: Expression, override val location: Location) : Expression
 
   data class Abstraction(
-    val param: Pat,
+    val parameter: Pat,
     val value: Expression,
     override val location: Location,
   ) : Expression

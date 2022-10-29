@@ -15,7 +15,7 @@ class Typer {
   fun tiExpression(expression: Expression, env: Env = emptyEnv()): Pair<Subst, Typ> {
     return when (expression) {
       is Expression.Group -> tiExpression(expression.value, env)
-      is Expression.Literal -> emptySubst() to tiLiteral(expression.lit)
+      is Expression.Literal -> emptySubst() to tiLiteral(expression.literal)
 
       is Expression.Variable -> {
         val scheme = env[expression.id.name]
@@ -35,7 +35,7 @@ class Typer {
       }
 
       is Expression.Abstraction -> {
-        val (tv, newEnv) = tiPat(expression.param, env)
+        val (tv, newEnv) = tiPat(expression.parameter, env)
         val (subst, typ) = tiExpression(expression.value, newEnv)
 
         subst to ((tv arrow typ) apply subst)
