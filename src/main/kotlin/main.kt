@@ -12,15 +12,15 @@ import ekko.typing.Typer
 import ekko.typing.arrow
 import kotlin.io.path.createTempFile
 import kotlin.io.path.writeText
-import org.antlr.v4.kotlinruntime.CharStreams
-import org.antlr.v4.kotlinruntime.CommonTokenStream
-import org.antlr.v4.kotlinruntime.DiagnosticErrorListener
+import org.antlr.v4.runtime.CharStreams
+import org.antlr.v4.runtime.CommonTokenStream
+import org.antlr.v4.runtime.DiagnosticErrorListener
 
 fun main() {
-  val exp = readExp("""let f x = x, a = f id in a (\x -> x)""")
+  val exp = readExp("(sum 1) 1")
 
   val env = buildMap {
-    put("id", Forall("a") { Typ.variable("a") arrow Typ.variable("a") })
+    put("sum", Forall { Typ.Int arrow (Typ.Int arrow Typ.Int) })
   }
 
   println(Typer().runInfer(exp, env))

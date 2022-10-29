@@ -1,19 +1,10 @@
-import com.strumenta.antlrkotlin.gradleplugin.AntlrKotlinTask
-import ekko.gradle.KtSuppressFilterReader
+import ekko.gradle.AntlrPackagingTask
+import ekko.gradle.PACKAGE_FILE_HEADER
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-buildscript {
-  repositories {
-    maven("https://jitpack.io")
-    mavenCentral()
-  }
-
-  dependencies {
-    classpath("com.strumenta.antlr-kotlin:antlr-kotlin-gradle-plugin:160bc0b70f")
-  }
-}
-
 plugins {
+  antlr
+  java
   kotlin("jvm")
   id("org.jlleitschuh.gradle.ktlint")
   id("io.gitlab.arturbosch.detekt")
@@ -40,10 +31,13 @@ detekt {
   baseline = file("${rootProject.projectDir}/config/baseline.xml")
 }
 
+val mainAntlrOutputDirectory = buildDir.resolve("generated-src/antlr/main")
+val antlrOutputDirectory = buildDir.resolve("generated-src/antlr")
+
 kotlin {
   sourceSets {
     main {
-      kotlin.srcDirs(rootProject.file("src/generated/kotlin"))
+      kotlin.srcDirs(mainAntlrOutputDirectory)
     }
   }
 }
@@ -54,44 +48,29 @@ java {
 }
 
 dependencies {
+  antlr("org.antlr:antlr4:4.11.1")
   implementation("com.github.ajalt.mordant:mordant:2.0.0-beta7")
-  implementation("com.strumenta.antlr-kotlin:antlr-kotlin-runtime-jvm:160bc0b70f")
 }
 
-val generateMainAntlrSource by tasks.creating(AntlrKotlinTask::class) {
-  antlrClasspath = configurations.detachedConfiguration(
-    project.dependencies.create("org.antlr:antlr4:4.7.1"),
-    project.dependencies.create("com.strumenta.antlr-kotlin:antlr-kotlin-target:160bc0b70f"),
-  )
-  maxHeapSize = "64m"
-  arguments = listOf("-package", "ekko.parsing")
-  source = project.objects
-    .sourceDirectorySet("antlr", "antlr")
-    .srcDir("src/main/antlr").apply {
-      include("*.g4")
-    }
+tasks {
+  generateGrammarSource {
+    maxHeapSize = "64m"
+    arguments = arguments + listOf("-visitor", "-long-messages")
+    outputDirectory = antlrOutputDirectory.resolve("temp")
+  }
 
-  // Temporary folder for antlr generated files to be copied with `generateAntlrSource` task suppressing the warnings
-  outputDirectory = buildDir.resolve("build/generated/kotlin")
-}
+  test {
+    useJUnitPlatform()
+  }
 
-// Workaround to suppress Kotlin, Detekt and Ktlint warnings in generated parser source.
-// The original issue is at https://github.com/Strumenta/antlr-kotlin/issues/36.
-val generateAntlrSource by tasks.creating(Copy::class) {
-  dependsOn(generateMainAntlrSource)
-  from(buildDir.resolve("build/generated/kotlin")) // The previous configured temporary folder
-  include("**/*.kt")
-  filter<KtSuppressFilterReader>()
-  into(rootProject.file("src/generated/kotlin"))
-}
+  val generateParserSource by creating(Copy::class) {
+    from(generateGrammarSource)
+    into(mainAntlrOutputDirectory.resolve(PACKAGE_FILE_HEADER))
+    include("**/*.java")
+    filter<AntlrPackagingTask>()
+  }
 
-tasks.test {
-  useJUnitPlatform()
-}
-
-tasks.withType<KotlinCompile> {
-  // Makes the kotlin compile task depends on `generateAntlrSource` task, to be easier to set up a CI pipeline, or even
-  // build the project
-  dependsOn(generateAntlrSource)
-  kotlinOptions.jvmTarget = "1.8"
+  withType<KotlinCompile> {
+    kotlinOptions.jvmTarget = "1.8"
+  }
 }

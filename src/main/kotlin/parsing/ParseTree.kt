@@ -1,7 +1,7 @@
 package ekko.parsing
 
-import org.antlr.v4.kotlinruntime.ParserRuleContext
-import org.antlr.v4.kotlinruntime.tree.TerminalNode
+import org.antlr.v4.runtime.ParserRuleContext
+import org.antlr.v4.runtime.tree.TerminalNode
 
 sealed interface ParseTreeElement {
   override fun toString(): String

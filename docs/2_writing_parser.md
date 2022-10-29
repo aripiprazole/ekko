@@ -4,10 +4,11 @@ Parsing can be hard when trying to write a parser from scratch, even if it is a 
 this article we are going to use `ANTLR`, that is a full-featured parser generator, that generates for differents
 targets(Java, C#, etc), so you can reutilize the parser in another projects.
 
-The Kotlin target for ANTLR, does not have official support, so we are going to
-use [Strumenta's](https://strumenta.com/) [antlr-kotlin](https://github.com/Strumenta/antlr-kotlin). You can
-check out [here](https://github.com/gabrielleeg1/ekko/blob/main/build.gradle.kts) project's buildscript configuration
-for `antlr-kotlin`.
+We have no official support for ANTLR in Kotlin, but we can use the Java runtime, so we can use the generated parser by
+the Java's gradle plugin. The plugin classpath is builtin in the gradle dependency manager.
+
+PS: We have an unofficial support, but the java is more mature and maintained, you can check out the Strumenta's
+runtime [here](https://github.com/Strumenta/antlr-kotlin)
 
 ## Table of contents
 
@@ -278,14 +279,14 @@ We can start making utilitary functions like:
 
 fun ParserRuleContext.getLocationIn(file: File): Location {
   return Location(
-    start = Position(start!!.startIndex, file),
-    end = Position(stop!!.stopIndex, file),
+    start = Position(start.startIndex, file),
+    end = Position(stop.stopIndex, file),
   )
 }
 
 fun Token.treeToIdent(file: File): Ident {
   return Ident(
-    text!!,
+    text,
     location = Location(
       start = Position(startIndex, file),
       end = Position(stopIndex, file),
@@ -300,13 +301,11 @@ maps `expressions`:
 ```kotlin
 // treeToExp.kt
 
-// The properties generated with `antlr-kotlin` are always nullable, so we need to coerce that variables that we know
-// aren't null.
 fun ExpContext.treeToExp(file: File): Exp {
   return when (this) {
     is ELetContext -> {
-      val names = findAlt().map { it.treeToAlt(file) }.associateBy { it.id }
-      val value = value!!.treeToExp(file)
+      val names = alt().map { it.treeToAlt(file) }.associateBy { it.id }
+      val value = value.treeToExp(file)
 
       ELet(names, value, getLocationIn(file))
     }
@@ -314,13 +313,13 @@ fun ExpContext.treeToExp(file: File): Exp {
     is EStringContext -> {
       // We use `.substring()` here, because the lexer includes the " characters at the start and at
       // the end of the string.
-      val text = value!!.text!!.substring(1, value!!.text!!.length - 1)
+      val text = value.text.substring(1, value!!.text!!.length - 1)
 
       ELit(LString(text, getLocationIn(file)))
     }
 
     is EAppContext -> {
-      EApp(lhs!!.treeToExp(file), rhs!!.treeToExp(file), getLocationIn(file))
+      EApp(lhs.treeToExp(file), rhs.treeToExp(file), getLocationIn(file))
     }
 
     // ...
@@ -342,15 +341,15 @@ cleaner like:
 ```kotlin
 context(File)
 fun ParserRuleContext.currentLocation(): Location {
-  return Location(Position(start!!.startIndex, this@File), Position(stop!!.stopIndex, this@File))
+  return Location(Position(start.startIndex, this@File), Position(stop.stopIndex, this@File))
 }
 
 context(File)
 fun ExpContext.treeToExp(): Exp {
   return when (this) {
     is ELetContext -> {
-      val names = findAlt().map { it.treeToAlt() }.associateBy { it.id }
-      val value = value!!.treeToExp()
+      val names = alt().map { it.treeToAlt() }.associateBy { it.id }
+      val value = value.treeToExp()
 
       ELet(names, value, currentLocation())
     }

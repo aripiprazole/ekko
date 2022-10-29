@@ -25,7 +25,7 @@ class Typer {
 
   fun tiExp(exp: Exp, env: Env = emptyEnv()): Pair<Subst, Typ> {
     return when (exp) {
-      is EGroup -> tiExp(exp.value)
+      is EGroup -> tiExp(exp.value, env)
       is ELit -> emptySubst() to tiLit(exp.lit)
 
       is EVar -> {

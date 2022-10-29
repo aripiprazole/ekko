@@ -4,10 +4,10 @@ import ekko.parsing.tree.Location
 import ekko.parsing.tree.Position
 import ekko.reporting.MError
 import ekko.reporting.Report
-import org.antlr.v4.kotlinruntime.BaseErrorListener
-import org.antlr.v4.kotlinruntime.RecognitionException
-import org.antlr.v4.kotlinruntime.Recognizer
-import org.antlr.v4.kotlinruntime.Token
+import org.antlr.v4.runtime.BaseErrorListener
+import org.antlr.v4.runtime.RecognitionException
+import org.antlr.v4.runtime.Recognizer
+import org.antlr.v4.runtime.Token
 
 class SyntaxError(message: String) : MError(0x01, "Syntax Error", message)
 
