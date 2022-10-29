@@ -34,7 +34,7 @@ class Typer {
         (s3 compose s2 compose s1) to (tv apply s3)
       }
 
-      is Expression.Abs -> {
+      is Expression.Abstraction -> {
         val (tv, newEnv) = tiPat(expression.param, env)
         val (subst, typ) = tiExpression(expression.value, newEnv)
 

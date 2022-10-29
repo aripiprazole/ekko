@@ -66,7 +66,7 @@ fun ExpContext.treeToExp(file: File): Expression {
       val param = param.treeToPat(file)
       val value = value.treeToExp(file)
 
-      Expression.Abs(param, value, getLocationIn(file))
+      Expression.Abstraction(param, value, getLocationIn(file))
     }
 
     is EInfixContext -> {

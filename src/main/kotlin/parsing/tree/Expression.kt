@@ -10,10 +10,13 @@ sealed interface Expression {
 
   data class Variable(val id: Ident, override val location: Location) : Expression
 
-  data class Abs(val param: Pat, val value: Expression, override val location: Location) :
-    Expression
-
   data class Group(val value: Expression, override val location: Location) : Expression
+
+  data class Abstraction(
+    val param: Pat,
+    val value: Expression,
+    override val location: Location,
+  ) : Expression
 
   data class Application(
     val lhs: Expression,
