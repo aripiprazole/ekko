@@ -8,17 +8,20 @@ import ekko.parsing.tree.Pattern
 class Typer {
   private var state: Int = 0
 
-  fun runInfer(expression: Expression, env: Env = emptyEnv()): Typ {
-    return tiExpression(expression, env).second
+  fun runInfer(expression: Expression, environment: Environment = emptyEnvironment()): Typ {
+    return tiExpression(expression, environment).second
   }
 
-  fun tiExpression(expression: Expression, env: Env = emptyEnv()): Pair<Subst, Typ> {
+  fun tiExpression(
+    expression: Expression,
+    environment: Environment = emptyEnvironment(),
+  ): Pair<Subst, Typ> {
     return when (expression) {
-      is Expression.Group -> tiExpression(expression.value, env)
+      is Expression.Group -> tiExpression(expression.value, environment)
       is Expression.Literal -> emptySubst() to tiLiteral(expression.literal)
 
       is Expression.Variable -> {
-        val scheme = env[expression.id.name]
+        val scheme = environment[expression.id.name]
           ?: throw InferException("unbound variable: ${expression.id}")
 
         emptySubst() to inst(scheme)
@@ -26,8 +29,8 @@ class Typer {
 
       is Expression.Application -> {
         val tv = fresh()
-        val (s1, t1) = tiExpression(expression.lhs, env)
-        val (s2, t2) = tiExpression(expression.rhs, env.apply(s1))
+        val (s1, t1) = tiExpression(expression.lhs, environment)
+        val (s2, t2) = tiExpression(expression.rhs, environment.apply(s1))
 
         val s3 = mgu(t1, t2 arrow tv)
 
@@ -35,7 +38,7 @@ class Typer {
       }
 
       is Expression.Abstraction -> {
-        val (tv, newEnv) = tiPattern(expression.parameter, env)
+        val (tv, newEnv) = tiPattern(expression.parameter, environment)
         val (subst, typ) = tiExpression(expression.value, newEnv)
 
         subst to ((tv arrow typ) apply subst)
@@ -43,7 +46,7 @@ class Typer {
 
       is Expression.Let -> {
         var newSubst = emptySubst()
-        var newEnv = env.toMap()
+        var newEnv = environment.toMap()
 
         for (alt in expression.bindings.values) {
           val (subst, typ) = tiAlternative(alt, newEnv)
@@ -59,9 +62,9 @@ class Typer {
     }
   }
 
-  fun tiAlternative(alternative: Alternative, env: Env): Pair<Subst, Typ> {
+  fun tiAlternative(alternative: Alternative, environment: Environment): Pair<Subst, Typ> {
     val parameters = mutableListOf<Typ>()
-    val newEnv = env.toMutableMap()
+    val newEnv = environment.toMutableMap()
 
     for (pat in alternative.patterns) {
       val (typ, currentEnv) = tiPattern(pat, newEnv)
@@ -77,12 +80,12 @@ class Typer {
     }
   }
 
-  fun tiPattern(pattern: Pattern, env: Env): Pair<Typ, Env> {
+  fun tiPattern(pattern: Pattern, environment: Environment): Pair<Typ, Environment> {
     return when (pattern) {
       is Pattern.Variable -> {
         val typ = fresh()
 
-        typ to env.extendEnv(pattern.id.name to Forall(emptySet(), typ))
+        typ to environment.extendEnv(pattern.id.name to Forall(emptySet(), typ))
       }
     }
   }
@@ -96,8 +99,8 @@ class Typer {
     }
   }
 
-  private fun generalize(typ: Typ, env: Env): Forall {
-    val names = env.ftv()
+  private fun generalize(typ: Typ, environment: Environment): Forall {
+    val names = environment.ftv()
 
     return Forall(typ.ftv().filter { it !in names }.toSet(), typ)
   }
