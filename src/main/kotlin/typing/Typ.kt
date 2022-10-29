@@ -8,39 +8,39 @@ sealed interface Typ {
     val String: Typ = constructor("String")
     val Arrow: Typ = constructor("->")
 
-    fun variable(name: String): Typ = TVar(name)
-    fun constructor(name: String): Typ = TCon(name)
-    fun app(lhs: Typ, rhs: Typ): Typ = TApp(lhs, rhs)
+    fun variable(name: String): Typ = VarTyp(name)
+    fun constructor(name: String): Typ = ConstructorTyp(name)
+    fun app(lhs: Typ, rhs: Typ): Typ = AppTyp(lhs, rhs)
   }
 }
 
-data class TApp(val lhs: Typ, val rhs: Typ) : Typ {
+data class AppTyp(val lhs: Typ, val rhs: Typ) : Typ {
   override fun toString(): String = when {
-    lhs is TApp && rhs is TApp -> "($lhs) $rhs"
+    lhs is AppTyp && rhs is AppTyp -> "($lhs) $rhs"
     else -> "$lhs $rhs"
   }
 }
 
-data class TCon(val id: String) : Typ {
+data class ConstructorTyp(val id: String) : Typ {
   override fun toString(): String = id
 }
 
-data class TVar(val id: String) : Typ {
+data class VarTyp(val id: String) : Typ {
   override fun toString(): String = "'$id"
 }
 
 fun Typ.ftv(): Set<String> = when (this) {
-  is TCon -> emptySet()
-  is TVar -> setOf(id)
-  is TApp -> lhs.ftv() + rhs.ftv()
+  is ConstructorTyp -> emptySet()
+  is VarTyp -> setOf(id)
+  is AppTyp -> lhs.ftv() + rhs.ftv()
 }
 
 infix fun Typ.apply(subst: Subst): Typ {
   return when (this) {
-    is TApp -> copy(lhs = lhs apply subst, rhs = rhs apply subst)
-    is TCon -> this
-    is TVar -> subst[id] ?: this
+    is AppTyp -> copy(lhs = lhs apply subst, rhs = rhs apply subst)
+    is ConstructorTyp -> this
+    is VarTyp -> subst[id] ?: this
   }
 }
 
-infix fun Typ.arrow(rhs: Typ) = TApp(this, TApp(Typ.Arrow, rhs))
+infix fun Typ.arrow(rhs: Typ) = AppTyp(this, AppTyp(Typ.Arrow, rhs))

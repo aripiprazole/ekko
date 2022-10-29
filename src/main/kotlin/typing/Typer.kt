@@ -1,19 +1,8 @@
 package ekko.typing
 
 import ekko.parsing.tree.Alt
-import ekko.parsing.tree.EAbs
-import ekko.parsing.tree.EApp
-import ekko.parsing.tree.EGroup
-import ekko.parsing.tree.ELet
-import ekko.parsing.tree.ELit
-import ekko.parsing.tree.EVar
 import ekko.parsing.tree.Exp
-import ekko.parsing.tree.LFloat
-import ekko.parsing.tree.LInt
-import ekko.parsing.tree.LString
-import ekko.parsing.tree.LUnit
 import ekko.parsing.tree.Lit
-import ekko.parsing.tree.PVar
 import ekko.parsing.tree.Pat
 
 class Typer {
@@ -25,16 +14,16 @@ class Typer {
 
   fun tiExp(exp: Exp, env: Env = emptyEnv()): Pair<Subst, Typ> {
     return when (exp) {
-      is EGroup -> tiExp(exp.value, env)
-      is ELit -> emptySubst() to tiLit(exp.lit)
+      is Exp.Group -> tiExp(exp.value, env)
+      is Exp.Lit -> emptySubst() to tiLit(exp.lit)
 
-      is EVar -> {
+      is Exp.Var -> {
         val scheme = env[exp.id.name] ?: throw InferException("unbound variable: ${exp.id}")
 
         emptySubst() to inst(scheme)
       }
 
-      is EApp -> {
+      is Exp.App -> {
         val tv = fresh()
         val (s1, t1) = tiExp(exp.lhs, env)
         val (s2, t2) = tiExp(exp.rhs, env.apply(s1))
@@ -44,14 +33,14 @@ class Typer {
         (s3 compose s2 compose s1) to (tv apply s3)
       }
 
-      is EAbs -> {
+      is Exp.Abs -> {
         val (tv, newEnv) = tiPat(exp.param, env)
         val (subst, typ) = tiExp(exp.value, newEnv)
 
         subst to ((tv arrow typ) apply subst)
       }
 
-      is ELet -> {
+      is Exp.Let -> {
         var newSubst = emptySubst()
         var newEnv = env.toMap()
 
@@ -89,7 +78,7 @@ class Typer {
 
   fun tiPat(pat: Pat, env: Env): Pair<Typ, Env> {
     return when (pat) {
-      is PVar -> {
+      is Pat.Var -> {
         val typ = fresh()
 
         typ to env.extendEnv(pat.id.name to Forall(emptySet(), typ))
@@ -99,10 +88,10 @@ class Typer {
 
   fun tiLit(lit: Lit): Typ {
     return when (lit) {
-      is LInt -> Typ.Int
-      is LFloat -> Typ.Float
-      is LString -> Typ.String
-      is LUnit -> Typ.Unit
+      is Lit.Int -> Typ.Int
+      is Lit.Float -> Typ.Float
+      is Lit.String -> Typ.String
+      is Lit.Unit -> Typ.Unit
     }
   }
 
@@ -121,9 +110,9 @@ class Typer {
   private fun mgu(lhs: Typ, rhs: Typ): Subst {
     return when {
       lhs == rhs -> emptySubst()
-      lhs is TVar -> lhs bind rhs
-      rhs is TVar -> rhs bind lhs
-      lhs is TApp && rhs is TApp -> {
+      lhs is VarTyp -> lhs bind rhs
+      rhs is VarTyp -> rhs bind lhs
+      lhs is AppTyp && rhs is AppTyp -> {
         val s1 = mgu(lhs.lhs, rhs.lhs)
         val s2 = mgu(lhs.rhs apply s1, rhs.rhs apply s1)
 
@@ -134,13 +123,13 @@ class Typer {
     }
   }
 
-  private infix fun TVar.bind(other: Typ): Subst = when {
+  private infix fun VarTyp.bind(other: Typ): Subst = when {
     this == other -> emptySubst()
     id in other.ftv() -> throw InferException("infinite type $id in $other")
     else -> substOf(id to other)
   }
 
-  private fun fresh(): Typ = TVar(letters.elementAt(++state))
+  private fun fresh(): Typ = VarTyp(letters.elementAt(++state))
 
   private val letters: Sequence<String> = sequence {
     var prefix = ""

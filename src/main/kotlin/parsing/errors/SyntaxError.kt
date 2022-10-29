@@ -2,14 +2,14 @@ package ekko.parsing.errors
 
 import ekko.parsing.tree.Location
 import ekko.parsing.tree.Position
-import ekko.reporting.MError
+import ekko.reporting.Message
 import ekko.reporting.Report
 import org.antlr.v4.runtime.BaseErrorListener
 import org.antlr.v4.runtime.RecognitionException
 import org.antlr.v4.runtime.Recognizer
 import org.antlr.v4.runtime.Token
 
-class SyntaxError(message: String) : MError(0x01, "Syntax Error", message)
+class SyntaxError(message: String) : Message.Error(0x01, "Syntax Error", message)
 
 class SyntaxErrorListener(val report: Report) : BaseErrorListener() {
   override fun syntaxError(
