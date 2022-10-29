@@ -17,7 +17,7 @@ class Typer {
       is Exp.Group -> tiExp(exp.value, env)
       is Exp.Lit -> emptySubst() to tiLit(exp.lit)
 
-      is Exp.Var -> {
+      is Exp.Variable -> {
         val scheme = env[exp.id.name] ?: throw InferException("unbound variable: ${exp.id}")
 
         emptySubst() to inst(scheme)

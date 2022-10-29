@@ -33,7 +33,7 @@ fun ExpContext.treeToExp(file: File): Exp {
     is EVarContext -> {
       val ident = value.treeToIdent(file)
 
-      Exp.Var(ident, getLocationIn(file))
+      Exp.Variable(ident, getLocationIn(file))
     }
 
     is EGroupContext -> {
@@ -76,7 +76,7 @@ fun ExpContext.treeToExp(file: File): Exp {
 
       Exp.App(
         lhs = Exp.App(
-          lhs = Exp.Var(id = callee, location = callee.location),
+          lhs = Exp.Variable(id = callee, location = callee.location),
           rhs = lhs,
           location = lhs.location.endIn(callee.location),
         ),

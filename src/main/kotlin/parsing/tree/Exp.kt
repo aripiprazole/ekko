@@ -7,7 +7,7 @@ sealed interface Exp {
 
   data class Lit(val lit: AstLit, override val location: Location = lit.location) : Exp
 
-  data class Var(val id: Ident, override val location: Location) : Exp
+  data class Variable(val id: Ident, override val location: Location) : Exp
 
   data class App(val lhs: Exp, val rhs: Exp, override val location: Location) : Exp
 
