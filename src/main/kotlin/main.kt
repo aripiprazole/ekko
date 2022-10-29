@@ -12,9 +12,9 @@ import ekko.typing.Typer
 import ekko.typing.arrow
 import kotlin.io.path.createTempFile
 import kotlin.io.path.writeText
-import org.antlr.v4.kotlinruntime.CharStreams
-import org.antlr.v4.kotlinruntime.CommonTokenStream
-import org.antlr.v4.kotlinruntime.DiagnosticErrorListener
+import org.antlr.v4.runtime.CharStreams
+import org.antlr.v4.runtime.CommonTokenStream
+import org.antlr.v4.runtime.DiagnosticErrorListener
 
 fun main() {
   val exp = readExp("(sum 1) 1")

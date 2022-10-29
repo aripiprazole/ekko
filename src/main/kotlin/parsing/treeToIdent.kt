@@ -6,7 +6,7 @@ import ekko.parsing.tree.Ident
 import ekko.parsing.tree.Location
 import ekko.parsing.tree.Position
 import java.io.File
-import org.antlr.v4.kotlinruntime.Token
+import org.antlr.v4.runtime.Token
 
 fun IdentContext.treeToIdent(file: File): Ident {
   val text = if (text.startsWith("(")) text.substring(1, text.length - 1) else text

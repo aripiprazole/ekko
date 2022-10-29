@@ -6,7 +6,7 @@ import java.io.File
 
 fun AltContext.treeToAlt(file: File): Alt {
   val name = name!!.treeToIdent(file)
-  val pattern = findPat().map { it.treeToPat(file) }
+  val pattern = pat().map { it.treeToPat(file) }
   val value = value!!.treeToExp(file)
 
   return Alt(name, pattern, value, getLocationIn(file))

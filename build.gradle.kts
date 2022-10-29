@@ -1,4 +1,5 @@
-
+import ekko.gradle.AntlrPackagingTask
+import ekko.gradle.PACKAGE_FILE_HEADER
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -30,10 +31,13 @@ detekt {
   baseline = file("${rootProject.projectDir}/config/baseline.xml")
 }
 
+val mainAntlrOutputDirectory = buildDir.resolve("generated-src/antlr/main")
+val antlrOutputDirectory = buildDir.resolve("generated-src/antlr")
+
 kotlin {
   sourceSets {
     main {
-      kotlin.srcDirs(rootProject.file("src/generated/kotlin"))
+      kotlin.srcDirs(mainAntlrOutputDirectory)
     }
   }
 }
@@ -44,19 +48,29 @@ java {
 }
 
 dependencies {
-  antlr("org.antlr:antlr4:4.10.1")
+  antlr("org.antlr:antlr4:4.11.1")
   implementation("com.github.ajalt.mordant:mordant:2.0.0-beta7")
 }
 
-tasks.generateGrammarSource {
-  maxHeapSize = "64m"
-  arguments = arguments + listOf("-visitor", "-long-messages")
-}
+tasks {
+  generateGrammarSource {
+    maxHeapSize = "64m"
+    arguments = arguments + listOf("-visitor", "-long-messages")
+    outputDirectory = antlrOutputDirectory.resolve("temp")
+  }
 
-tasks.test {
-  useJUnitPlatform()
-}
+  test {
+    useJUnitPlatform()
+  }
 
-tasks.withType<KotlinCompile> {
-  kotlinOptions.jvmTarget = "1.8"
+  val generateParserSource by creating(Copy::class) {
+    from(generateGrammarSource)
+    into(mainAntlrOutputDirectory.resolve(PACKAGE_FILE_HEADER))
+    include("**/*.java")
+    filter<AntlrPackagingTask>()
+  }
+
+  withType<KotlinCompile> {
+    kotlinOptions.jvmTarget = "1.8"
+  }
 }
