@@ -75,6 +75,7 @@ tasks {
   }
 
   withType<KotlinCompile> {
+    dependsOn(compileJava)
     kotlinOptions.jvmTarget = "1.8"
   }
 }
