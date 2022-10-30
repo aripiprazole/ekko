@@ -14,7 +14,8 @@ SYMBOL: SUM | SUB | TIMES | DIV | EQ | GT | LT | TURNED_A | INTERROGATION | AT |
 LPAREN: '(';
 RPAREN: ')';
 EQ: '=';
-COLON: ',';
+COLON: ':';
+COMMA: ',';
 BAR: '\\';
 ARROW: '->';
 GT: '>';
@@ -33,6 +34,8 @@ SUB: '-';
 TIMES: '*';
 DIV: '/';
 
+FORALL: TURNED_A | 'forall';
+
 IDENT: ['a-zA-Z_]['a-zA-Z0-9_]*;
 STRING: '"' (~["\r\n\\] | '\\' ~[\r\n])* '"';
 INT: [0-9]+ ;
@@ -47,12 +50,16 @@ pat: name=ident # PVar;
 
 alt: name=ident pat* EQ value=exp;
 
-exp: LET alt (COLON alt)* IN value=exp # ELet
-   | BAR param=pat ARROW value=exp     # EAbs
-   | value=ident                       # EVar
-   | value=STRING                      # EString
-   | value=INT                         # EInt
-   | value=DECIMAL                     # EDecimal
-   | lhs=exp callee=infixIdent rhs=exp # EInfix
-   | lhs=exp rhs=exp                   # EApp
-   | LPAREN value=exp RPAREN           # EGroup;
+typ: name=ident                        # TVar
+   | lhs=typ callee=infixIdent rhs=typ # TInfix
+   | lhs=typ rhs=typ                   # TApp;
+
+exp: LET alt (COMMA alt)* IN value=exp            # ELet
+   | BAR param=pat ARROW value=exp                # EAbs
+   | value=ident                                  # EVar
+   | value=STRING                                 # EString
+   | value=INT                                    # EInt
+   | value=DECIMAL                                # EDecimal
+   | lhs=exp callee=infixIdent rhs=exp            # EInfix
+   | lhs=exp rhs=exp                              # EApp
+   | LPAREN value=exp RPAREN                      # EGroup;
