@@ -4,7 +4,7 @@ import ekko.parsing.EkkoLexer
 import ekko.parsing.EkkoParser
 import ekko.parsing.errors.SyntaxErrorListener
 import ekko.parsing.tree.Expression
-import ekko.parsing.treeToExp
+import ekko.parsing.treeToExpression
 import ekko.reporting.Report
 import ekko.typing.Forall
 import ekko.typing.Type
@@ -17,7 +17,7 @@ import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.DiagnosticErrorListener
 
 fun main() {
-  val exp = readExp("1 >+ 2")
+  val exp = readExp("let x: ∀ a. a -> a = 10 in x")
 
   val env = buildMap {
     put("sum", Forall { Type.Int arrow (Type.Int arrow Type.Int) })
@@ -46,5 +46,5 @@ fun readExp(input: String): Expression {
     error("Can't proceed due to syntax errors")
   }
 
-  return tree.treeToExp(file)
+  return tree.treeToExpression(file)
 }
