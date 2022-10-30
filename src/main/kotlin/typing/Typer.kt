@@ -130,7 +130,7 @@ class Typer {
   private infix fun Type.Variable.bind(other: Type): Substitution = when {
     this == other -> emptySubstitution()
     id in other.ftv() -> throw InferException("infinite type $id in $other")
-    else -> substOf(id to other)
+    else -> substitutionOf(id to other)
   }
 
   private fun fresh(): Type = Type.Variable(letters.elementAt(++state))
