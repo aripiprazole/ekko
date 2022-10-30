@@ -5,4 +5,5 @@ data class Alternative(
   val patterns: List<Pattern>,
   val expression: Expression,
   val location: Location,
+  val type: ParsedType? = null,
 )

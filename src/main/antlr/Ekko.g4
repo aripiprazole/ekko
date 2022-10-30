@@ -45,7 +45,8 @@ infixIdent: IDENT | symbolIdent;
 
 pat: name=ident # PVar;
 
-alt: name=ident pat* EQ value=exp;
+alt: name=ident pat* EQ value=exp # AInfer
+   | name=ident COLON type=typ EQ value=exp # ATyped;
 
 typ: name=ident                        # TVar
    | lhs=typ callee=infixIdent rhs=typ # TInfix

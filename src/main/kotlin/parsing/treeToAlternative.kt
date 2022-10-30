@@ -1,13 +1,29 @@
 package ekko.parsing
 
+import ekko.parsing.EkkoParser.AInferContext
+import ekko.parsing.EkkoParser.ATypedContext
 import ekko.parsing.EkkoParser.AltContext
 import ekko.parsing.tree.Alternative
 import java.io.File
 
 fun AltContext.treeToAlternative(file: File): Alternative {
-  val name = name.treeToIdent(file)
-  val pattern = pat().map { it.treeToPattern(file) }
-  val value = value.treeToExp(file)
+  when (this) {
+    is AInferContext -> {
+      val name = name.treeToIdent(file)
+      val pattern = pat().map { it.treeToPattern(file) }
+      val value = value.treeToExp(file)
 
-  return Alternative(name, pattern, value, getLocationIn(file))
+      return Alternative(name, pattern, value, getLocationIn(file))
+    }
+
+    is ATypedContext -> {
+      val name = name.treeToIdent(file)
+      val type = type.treeToType(file)
+      val value = value.treeToExp(file)
+
+      return Alternative(name, emptyList(), value, getLocationIn(file), type)
+    }
+
+    else -> throw IllegalArgumentException("Unsupported alternative: ${this::class}")
+  }
 }
