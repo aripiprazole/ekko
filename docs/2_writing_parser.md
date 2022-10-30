@@ -28,34 +28,34 @@ The Abstract Syntax Tree(known briefly as AST) is a tree representation of the S
 of Ekko project is:
 
 Expression in the base of expressions in a programming language, which can be in Ekko's case, from literals(integers,
-decimals, strings, unit) to function calls(known as `EApp`) and lambdas(that will not be implemented at this moment of
+decimals, strings, unit) to function calls(known as `Expression.Application`) and lambdas(that will not be implemented at this moment of
 the article).
 
 ```kotlin
-// Exp.kt
-sealed interface Exp
-
-data class ELet(val bindings: Map<Ident, Alt>, val value: Exp) : Exp
-data class ELit(val lit: Lit) : Exp
-data class EVar(val id: Ident) : Exp
-data class EApp(val lhs: Exp, val rhs: Exp) : Exp
-data class EGroup(val value: Exp) : Exp
+// Expression.kt
+sealed interface Expression {
+  data class Let(val bindings: Map<Ident, Alternative>, val value: Expression) : Expression
+  data class Literal(val lit: ekko.parsing.Literal) : Expression
+  data class Variable(val id: Ident) : Expression
+  data class Application(val lhs: Expression, val rhs: Expression) : Expression
+  data class Group(val value: Expression) : Expression
+}
 ```
 
 And literals are representation of simple and primary values, like pairs, tuples, integers, decimals, strings, units.
 
 ```kotlin
-// Lit.kt
-sealed interface Lit
+// Litteral.kt
+sealed interface Literal {
+  data class Int(val value: kotlin.Int) : Lit
+  data class Float(val value: kotlin.Float) : Lit
+  data class String(val value: kotlin.String) : Lit {
+    override fun toString(): kotlin.String = "String(value=\"$value\")"
+  }
 
-data class LInt(val value: Int) : Lit
-data class LFloat(val value: Float) : Lit
-data class LString(val value: String) : Lit {
-  override fun toString(): String = "LString(value=\"$value\")"
-}
-
-object LUnit : Lit {
-  override fun toString(): String = "()"
+  object Unit : Literal {
+    override fun toString(): kotlin.String = "()"
+  }
 }
 ```
 
@@ -69,23 +69,25 @@ data class Ident(val name: String, val displayName: String = name) {
 }
 ```
 
-...And `Alt` are alternatives in a function, or in let bindings, like: `let f x = x in f 10`. They have patterns as
+...And `Alternative` are alternatives in a function, or in let bindings, like: `let f x = x in f 10`. They have patterns
+as
 parameters, to enable the pattern matching at call, like Haskell, Elixir also do, and have an expression as the "body",
 because the language is going to be a pure functional language.
 
 ```kotlin
 // Alt.kt
-data class Alt(val id: Ident, val patterns: List<Pat>, val exp: Exp)
+data class Alternative(val id: Ident, val patterns: List<Pat>, val expression: Expression)
 ```
 
-So, `Pat` are representations of patterns, that at this moment, will not be taken in-deep, to maintain the simplicity.
+So, `Pattern` are representations of patterns, that at this moment, will not be taken in-deep, to maintain the
+simplicity.
 But currently have a representation of name identifiers.
 
 ```kotlin
-// Pat.kt
-sealed interface Pat
-
-data class PVar(val id: Ident) : Pat
+// Pattern.kt
+sealed interface Pattern {
+  data class Variable(val id: Ident) : Pattern
+}
 ```
 
 ## Location
@@ -301,13 +303,13 @@ maps `expressions`:
 ```kotlin
 // treeToExp.kt
 
-fun ExpContext.treeToExp(file: File): Exp {
+fun ExpContext.treeToExpression(file: File): Exp {
   return when (this) {
     is ELetContext -> {
-      val names = alt().map { it.treeToAlt(file) }.associateBy { it.id }
-      val value = value.treeToExp(file)
+      val names = alt().map { it.treeToAlternative(file) }.associateBy { it.id }
+      val value = value.treeToExpression(file)
 
-      ELet(names, value, getLocationIn(file))
+      Expression.Let(names, value, getLocationIn(file))
     }
 
     is EStringContext -> {
@@ -315,11 +317,11 @@ fun ExpContext.treeToExp(file: File): Exp {
       // the end of the string.
       val text = value.text.substring(1, value!!.text!!.length - 1)
 
-      ELit(LString(text, getLocationIn(file)))
+      Expression.Literal(Literal.String(text, getLocationIn(file)))
     }
 
     is EAppContext -> {
-      EApp(lhs.treeToExp(file), rhs.treeToExp(file), getLocationIn(file))
+      Exprssion.Application(lhs.treeToExpression(file), rhs.treeToExpression(file), getLocationIn(file))
     }
 
     // ...
@@ -345,13 +347,13 @@ fun ParserRuleContext.currentLocation(): Location {
 }
 
 context(File)
-fun ExpContext.treeToExp(): Exp {
+fun ExpContext.treeToExpression(): Expression {
   return when (this) {
     is ELetContext -> {
-      val names = alt().map { it.treeToAlt() }.associateBy { it.id }
+      val names = alt().map { it.treeToAlternative() }.associateBy { it.id }
       val value = value.treeToExp()
 
-      ELet(names, value, currentLocation())
+      Expression.Let(names, value, currentLocation())
     }
 
     // ...

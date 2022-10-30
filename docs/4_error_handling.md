@@ -15,17 +15,17 @@ sealed class Message(
   abstract val prefix: String
 }
 
-abstract class MHint(code: Int, name: String, message: String) : Message(code, name, message) {
+abstract class HintMessage(code: Int, name: String, message: String) : Message(code, name, message) {
   override val color: TextColors = TextColors.brightBlue
   override val prefix: String = "hint"
 }
 
-abstract class MWarning(code: Int, name: String, message: String) : Message(code, name, message) {
+abstract class WarningMessage(code: Int, name: String, message: String) : Message(code, name, message) {
   override val color: TextColors = TextColors.brightYellow
   override val prefix: String = "warning"
 }
 
-abstract class MError(code: Int, name: String, message: String) : Message(code, name, message) {
+abstract class ErrorMessage(code: Int, name: String, message: String) : Message(code, name, message) {
   override val color: TextColors = TextColors.brightRed
   override val prefix: String = "error"
 }
