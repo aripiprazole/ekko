@@ -114,9 +114,9 @@ class Typer {
   private fun mgu(lhs: Type, rhs: Type): Substitution {
     return when {
       lhs == rhs -> emptySubstitution()
-      lhs is VarType -> lhs bind rhs
-      rhs is VarType -> rhs bind lhs
-      lhs is AppType && rhs is AppType -> {
+      lhs is Type.Variable -> lhs bind rhs
+      rhs is Type.Variable -> rhs bind lhs
+      lhs is Type.Application && rhs is Type.Application -> {
         val s1 = mgu(lhs.lhs, rhs.lhs)
         val s2 = mgu(lhs.rhs apply s1, rhs.rhs apply s1)
 
@@ -127,13 +127,13 @@ class Typer {
     }
   }
 
-  private infix fun VarType.bind(other: Type): Substitution = when {
+  private infix fun Type.Variable.bind(other: Type): Substitution = when {
     this == other -> emptySubstitution()
     id in other.ftv() -> throw InferException("infinite type $id in $other")
     else -> substOf(id to other)
   }
 
-  private fun fresh(): Type = VarType(letters.elementAt(++state))
+  private fun fresh(): Type = Type.Variable(letters.elementAt(++state))
 
   private val letters: Sequence<String> = sequence {
     var prefix = ""
