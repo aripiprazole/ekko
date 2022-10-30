@@ -31,6 +31,10 @@ detekt {
   baseline = file("${rootProject.projectDir}/config/baseline.xml")
 }
 
+ktlint {
+  version.set("0.47.1")
+}
+
 val mainAntlrOutputDirectory = buildDir.resolve("generated-src/antlr/main")
 val antlrOutputDirectory = buildDir.resolve("generated-src/antlr")
 
