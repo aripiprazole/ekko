@@ -3,11 +3,11 @@ package ekko
 import ekko.parsing.EkkoLexer
 import ekko.parsing.EkkoParser
 import ekko.parsing.errors.SyntaxErrorListener
-import ekko.parsing.tree.Exp
+import ekko.parsing.tree.Expression
 import ekko.parsing.treeToExp
 import ekko.reporting.Report
 import ekko.typing.Forall
-import ekko.typing.Typ
+import ekko.typing.Type
 import ekko.typing.Typer
 import ekko.typing.arrow
 import kotlin.io.path.createTempFile
@@ -20,13 +20,13 @@ fun main() {
   val exp = readExp("1 >+ 2")
 
   val env = buildMap {
-    put("sum", Forall { Typ.Int arrow (Typ.Int arrow Typ.Int) })
+    put("sum", Forall { Type.Int arrow (Type.Int arrow Type.Int) })
   }
 
   println(Typer().runInfer(exp, env))
 }
 
-fun readExp(input: String): Exp {
+fun readExp(input: String): Expression {
   val path = createTempFile("ekko", ".ekko").apply { writeText(input) }
   val file = path.toFile()
 

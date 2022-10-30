@@ -1,129 +1,124 @@
 package ekko.typing
 
-import ekko.parsing.tree.Alt
-import ekko.parsing.tree.EAbs
-import ekko.parsing.tree.EApp
-import ekko.parsing.tree.EGroup
-import ekko.parsing.tree.ELet
-import ekko.parsing.tree.ELit
-import ekko.parsing.tree.EVar
-import ekko.parsing.tree.Exp
-import ekko.parsing.tree.LFloat
-import ekko.parsing.tree.LInt
-import ekko.parsing.tree.LString
-import ekko.parsing.tree.LUnit
-import ekko.parsing.tree.Lit
-import ekko.parsing.tree.PVar
-import ekko.parsing.tree.Pat
+import ekko.parsing.tree.Alternative
+import ekko.parsing.tree.Expression
+import ekko.parsing.tree.Literal
+import ekko.parsing.tree.Pattern
 
 class Typer {
   private var state: Int = 0
 
-  fun runInfer(exp: Exp, env: Env = emptyEnv()): Typ {
-    return tiExp(exp, env).second
+  fun runInfer(expression: Expression, environment: Environment = emptyEnvironment()): Type {
+    return tiExpression(expression, environment).second
   }
 
-  fun tiExp(exp: Exp, env: Env = emptyEnv()): Pair<Subst, Typ> {
-    return when (exp) {
-      is EGroup -> tiExp(exp.value, env)
-      is ELit -> emptySubst() to tiLit(exp.lit)
+  fun tiExpression(
+    expression: Expression,
+    environment: Environment = emptyEnvironment(),
+  ): Pair<Substitution, Type> {
+    return when (expression) {
+      is Expression.Group -> tiExpression(expression.value, environment)
+      is Expression.Literal -> emptySubstitution() to tiLiteral(expression.literal)
 
-      is EVar -> {
-        val scheme = env[exp.id.name] ?: throw InferException("unbound variable: ${exp.id}")
+      is Expression.Variable -> {
+        val scheme = environment[expression.id.name]
+          ?: throw InferException("unbound variable: ${expression.id}")
 
-        emptySubst() to inst(scheme)
+        emptySubstitution() to instantiate(scheme)
       }
 
-      is EApp -> {
+      is Expression.Application -> {
         val tv = fresh()
-        val (s1, t1) = tiExp(exp.lhs, env)
-        val (s2, t2) = tiExp(exp.rhs, env.apply(s1))
+        val (s1, t1) = tiExpression(expression.lhs, environment)
+        val (s2, t2) = tiExpression(expression.rhs, environment.apply(s1))
 
         val s3 = mgu(t1, t2 arrow tv)
 
         (s3 compose s2 compose s1) to (tv apply s3)
       }
 
-      is EAbs -> {
-        val (tv, newEnv) = tiPat(exp.param, env)
-        val (subst, typ) = tiExp(exp.value, newEnv)
+      is Expression.Abstraction -> {
+        val (tv, newEnv) = tiPattern(expression.parameter, environment)
+        val (s, type) = tiExpression(expression.value, newEnv)
 
-        subst to ((tv arrow typ) apply subst)
+        s to ((tv arrow type) apply s)
       }
 
-      is ELet -> {
-        var newSubst = emptySubst()
-        var newEnv = env.toMap()
+      is Expression.Let -> {
+        var newSubstitution = emptySubstitution()
+        var newEnvironment = environment.toMap()
 
-        for (alt in exp.bindings.values) {
-          val (subst, typ) = tiAlt(alt, newEnv)
+        for (alternative in expression.bindings.values) {
+          val (s, typ) = tiAlternative(alternative, newEnvironment)
 
-          newSubst = newSubst compose subst
-          newEnv = newEnv.extendEnv(alt.id.name to generalize(typ, newEnv))
+          newSubstitution = newSubstitution compose s
+          newEnvironment = newEnvironment.extend(
+            alternative.id.name to generalize(typ, newEnvironment),
+          )
         }
 
-        val (subst, typ) = tiExp(exp.value, newEnv)
+        val (s, type) = tiExpression(expression.value, newEnvironment)
 
-        (subst compose newSubst) to typ
+        (s compose newSubstitution) to type
       }
     }
   }
 
-  fun tiAlt(alt: Alt, env: Env): Pair<Subst, Typ> {
-    val parameters = mutableListOf<Typ>()
-    val newEnv = env.toMutableMap()
+  fun tiAlternative(alternative: Alternative, environment: Environment): Pair<Substitution, Type> {
+    val parameters = mutableListOf<Type>()
+    val newEnvironment = environment.toMutableMap()
 
-    for (pat in alt.patterns) {
-      val (typ, currentEnv) = tiPat(pat, newEnv)
+    for (pattern in alternative.patterns) {
+      val (type, currentEnvironment) = tiPattern(pattern, newEnvironment)
 
-      parameters += typ
-      newEnv += currentEnv
+      parameters += type
+      newEnvironment += currentEnvironment
     }
 
-    val (subst, typ) = tiExp(alt.exp, newEnv)
+    val (s, type) = tiExpression(alternative.expression, newEnvironment)
 
-    return subst to parameters.fold(typ) { acc, next ->
+    return s to parameters.fold(type) { acc, next ->
       next arrow acc
     }
   }
 
-  fun tiPat(pat: Pat, env: Env): Pair<Typ, Env> {
-    return when (pat) {
-      is PVar -> {
-        val typ = fresh()
+  fun tiPattern(pattern: Pattern, environment: Environment): Pair<Type, Environment> {
+    return when (pattern) {
+      is Pattern.Variable -> {
+        val type = fresh()
 
-        typ to env.extendEnv(pat.id.name to Forall(emptySet(), typ))
+        type to environment.extend(pattern.id.name to Forall(emptySet(), type))
       }
     }
   }
 
-  fun tiLit(lit: Lit): Typ {
-    return when (lit) {
-      is LInt -> Typ.Int
-      is LFloat -> Typ.Float
-      is LString -> Typ.String
-      is LUnit -> Typ.Unit
+  fun tiLiteral(literal: Literal): Type {
+    return when (literal) {
+      is Literal.Int -> Type.Int
+      is Literal.Float -> Type.Float
+      is Literal.String -> Type.String
+      is Literal.Unit -> Type.Unit
     }
   }
 
-  private fun generalize(typ: Typ, env: Env): Forall {
-    val names = env.ftv()
+  private fun generalize(type: Type, environment: Environment): Forall {
+    val names = environment.ftv()
 
-    return Forall(typ.ftv().filter { it !in names }.toSet(), typ)
+    return Forall(type.ftv().filter { it !in names }.toSet(), type)
   }
 
-  private fun inst(scheme: Forall): Typ {
+  private fun instantiate(scheme: Forall): Type {
     val subst = scheme.names.associateWith { fresh() }
 
-    return scheme.typ apply subst
+    return scheme.type apply subst
   }
 
-  private fun mgu(lhs: Typ, rhs: Typ): Subst {
+  private fun mgu(lhs: Type, rhs: Type): Substitution {
     return when {
-      lhs == rhs -> emptySubst()
-      lhs is TVar -> lhs bind rhs
-      rhs is TVar -> rhs bind lhs
-      lhs is TApp && rhs is TApp -> {
+      lhs == rhs -> emptySubstitution()
+      lhs is Type.Variable -> lhs bind rhs
+      rhs is Type.Variable -> rhs bind lhs
+      lhs is Type.Application && rhs is Type.Application -> {
         val s1 = mgu(lhs.lhs, rhs.lhs)
         val s2 = mgu(lhs.rhs apply s1, rhs.rhs apply s1)
 
@@ -134,13 +129,13 @@ class Typer {
     }
   }
 
-  private infix fun TVar.bind(other: Typ): Subst = when {
-    this == other -> emptySubst()
+  private infix fun Type.Variable.bind(other: Type): Substitution = when {
+    this == other -> emptySubstitution()
     id in other.ftv() -> throw InferException("infinite type $id in $other")
-    else -> substOf(id to other)
+    else -> substitutionOf(id to other)
   }
 
-  private fun fresh(): Typ = TVar(letters.elementAt(++state))
+  private fun fresh(): Type = Type.Variable(letters.elementAt(++state))
 
   private val letters: Sequence<String> = sequence {
     var prefix = ""

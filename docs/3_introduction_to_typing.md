@@ -64,24 +64,26 @@ $$
 The $\forall$ represents the type parameters, and after the $.$, is the proper type. This structure can be represented in kotlin with the following classes:
 
 ```kotlin
-// Typ.kt
+// Type.kt
 
 // mono τ =
-sealed interface Typ
+sealed interface Type {
   // α
-  data class TCon(val id: String) : Typ
+  data class Constructor(val id: String) : Type
 
   // 'x
-  data class TVar(val id: String) : Typ
+  data class Variable(val id: String) : Type
 
   // τ_1 τ_2
-  data class TApp(val lhs: Typ, val rhs: Typ) : Typ
+  data class Application(val lhs: Type, val rhs: Type) : Type
+}
 
 // poly σ = ∀ α_1 ... α_n. τ
-data class Forall(val names: Set<String>, val typ: Typ)
+data class Forall(val names: Set<String>, val type: Type)
+
 ```
 
-> We can after writing the classes, implement the [toString] function to make easier to debug, like [Typ.kt](https://github.com/gabrielleeg1/ekko/blob/main/src/main/kotlin/typing/Typ.kt) and [Forall.kt](https://github.com/gabrielleeg1/ekko/blob/main/src/main/kotlin/typing/Forall.kt).
+> We can after writing the classes, implement the [toString] function to make easier to debug, like [Type.kt](https://github.com/gabrielleeg1/ekko/blob/main/src/main/kotlin/typing/Type.kt) and [Forall.kt](https://github.com/gabrielleeg1/ekko/blob/main/src/main/kotlin/typing/Forall.kt).
 
 ### Unification and free variables
 
@@ -101,12 +103,12 @@ $$
 
 ```kotlin
 // FTV.kt
-fun Env.ftv(): Set<String> = values.flatMap { it.ftv() }.toSet()
+fun Environment.ftv(): Set<String> = values.flatMap { it.ftv() }.toSet()
 
-fun Typ.ftv(): Set<String> = when (this) {
-  is TCon -> emptySet()
-  is TVar -> setOf(id)
-  is TApp -> lhs.ftv() + rhs.ftv()
+fun Type.ftv(): Set<String> = when (this) {
+  is Type.Construction -> emptySet()
+  is Type.Variable -> setOf(id)
+  is Type.Application -> lhs.ftv() + rhs.ftv()
 }
 ```
 
@@ -122,12 +124,12 @@ $$
 
 ```kotlin
 // Unify.kt
-fun mgu(lhs: Typ, rhs: Typ): Subst {
+fun mgu(lhs: Type, rhs: Type): Substitution {
   return when {
     lhs == rhs -> emptySubst()
-    lhs is TVar -> lhs bind rhs
-    rhs is TVar -> rhs bind lhs
-    lhs is TApp && rhs is TApp -> {
+    lhs is Type.Variable -> lhs bind rhs
+    rhs is Type.Variable -> rhs bind lhs
+    lhs is Type.Application && rhs is Type.Application -> {
       val s1 = mgu(lhs.lhs, rhs.lhs)
       val s2 = mgu(lhs.rhs apply s1, rhs.rhs apply s1)
 
@@ -138,10 +140,10 @@ fun mgu(lhs: Typ, rhs: Typ): Subst {
   }
 }
 
-infix fun TVar.bind(other: Typ): Subst = when {
-  this == other -> emptySubst()
+infix fun Type.Variable.bind(other: Type): Substitution = when {
+  this == other -> emptySubstitution()
   id in other.ftv() -> throw InferException("infinite type $id in $other")
-  else -> substOf(id to other)
+  else -> substitutionOf(id to other)
 }
 ```
 
@@ -155,19 +157,19 @@ The missing two functions, are `compose`, and `apply`:
 And can be implemented in kotlin as:
 
 ```kotlin
-infix fun Forall.apply(subst: Subst): Forall {
-  return Forall(names, typ.apply(subst))
+infix fun Forall.apply(subst: Substitution): Forall {
+  return Forall(names, type.apply(subst))
 }
 
-infix fun Typ.apply(subst: Subst): Typ {
+infix fun Type.apply(subst: Substitution): Typ {
   return when (this) {
-    is TApp -> copy(lhs = lhs apply subst, rhs = rhs apply subst)
-    is TCon -> this
-    is TVar -> subst[id] ?: this
+    is Type.Application -> copy(lhs = lhs apply subst, rhs = rhs apply subst)
+    is Type.Constructor -> this
+    is Type.Variable -> subst[id] ?: this
   }
 }
 
-infix fun Subst.compose(other: Subst): Subst {
+infix fun Substitution.compose(other: Substitution): Substitution {
  return plus(other).mapValues { it.value apply this }
 }
 ```
@@ -211,39 +213,39 @@ val letters: Sequence<String> = sequence {
 ...The letter sequence is a lazy list that enumerates from `a, b, c ...`, and when this finish, it will be combining the letters: `aa, ba, ca, ...`.
 
 ```kotlin
-fun fresh(): Typ = TVar(letters.elementAt(++state))
+fun fresh(): Type = Type.Variable(letters.elementAt(++state))
 ```
 
 Now, with the `fresh` function, we can start the type inference process.
 
 ```kotlin
-fun tiLit(lit: Lit): Typ {
-  return when (lit) {
-    is LInt -> Typ.Int
-    is LFloat -> Typ.Float
-    is LString -> Typ.String
-    is LUnit -> Typ.Unit
+fun tiLiteral(literal: Literal): Type {
+  return when (literal) {
+    is Literal.Int -> Type.Int
+    is Literal.Float -> Type.Float
+    is Literal.String -> Type.String
+    is Literal.Unit -> Type.Unit
   }
 }
 ```
 
-We can start with `tiLit`, that will type the constants, and for starting the `tiExp` function, we need to write the environment class:
+We can start with `tiLiteral`, that will type the constants, and for starting the `tiExpression` function, we need to write the environment class:
 
 ```kotlin
 // Env.kt
-typealias Env = Map<String, Forall>
+typealias Environment = Map<String, Forall>
 
-fun emptyEnv(): Env = emptyMap()
+fun emptyEnvironment(): Env = emptyMap()
 
-fun envOf(vararg pairs: Pair<String, Forall>): Env = mapOf(pairs = pairs)
+fun environmentOf(vararg pairs: Pair<String, Forall>): Env = mapOf(pairs = pairs)
 
-fun Env.ftv(): Set<String> = values.flatMap { it.ftv() }.toSet()
+fun Environment.ftv(): Set<String> = values.flatMap { it.ftv() }.toSet()
 
-fun Env.extendEnv(vararg pairs: Pair<String, Forall>): Env {
-  return this + envOf(pairs = pairs)
+fun Environment.extendEnv(vararg pairs: Pair<String, Forall>): Environment {
+  return this + environmentOf(pairs = pairs)
 }
 
-fun Env.apply(subst: Subst): Env {
+fun Environment.apply(subst: Substitution): Env {
   return mapValues { it.value.apply(subst) }
 }
 ```
@@ -251,23 +253,24 @@ fun Env.apply(subst: Subst): Env {
 We use a type alias, to be easier to iterate without re-implementing all of them.
 
 ```kotlin
-fun tiExp(exp: Exp, env: Env = emptyEnv()): Pair<Subst, Typ> {
-  return when (exp) {
-    is EGroup -> tiExp(exp.value)
+fun tiExpression(expression: Exp, environment: Env = emptyEnv()): Pair<Subst, Typ> {
+  return when (expression) {
+    is Expression.Group -> tiExpression(expression.value)
 
-    is ELit -> emptySubst() to tiLit(exp.lit)
+    is Expression.Lit -> emptySubstitution() to tiLiteral(expression.lit)
 
-    is EVar -> {
-      val scheme = env[exp.id.name] ?: throw InferException("unbound variable: ${exp.id}")
+    is Expression.Variable -> {
+      val scheme = environment[expression.id.name]
+        ?: throw InferException("unbound variable: ${expression.id}")
 
-      emptySubst() to inst(scheme)
+      emptySubstitution() to instantiate(scheme)
     }
 
-    is EApp -> { ... }
+    is Expression.Application -> { /* ... */ }
 
-    is EAbs -> { ... }
+    is Expression.Abstraction -> { /* ... */ }
 
-    is ELet -> { ... }
+    is Expression.Let -> { /* ... */ }
   }
 }
 ```
@@ -276,15 +279,15 @@ The base implementation is quite simple, because it is just using the utility fu
 
 ```kotlin
 val tv = fresh() // this is the return type
-val (s1, t1) = tiExp(exp.lhs, env)
-val (s2, t2) = tiExp(exp.rhs, env apply s1)
+val (s1, t1) = tiExpression(exp.lhs, env)
+val (s2, t2) = tiExpression(exp.rhs, env apply s1)
 
 val s3 = mgu(t1, t2 arrow tv)
 
 (s3 compose s2 compose s1) to (tv apply s3)
 ```
 
-> Note that we can cast the `t1` to `TApp`, but it would be so much hard because the `->` type isn't a variant of `Typ`, so we would need to deconstruct `t1`, and it will miss the validation part, that is essential for a good compiler. The `mgu` takes care of the _logical equation_ and the _validation_.
+> Note that we can cast the `t1` to `Type.Application`, but it would be so much hard because the `->` type isn't a variant of `Typ`, so we would need to deconstruct `t1`, and it will miss the validation part, that is essential for a good compiler. The `mgu` takes care of the _logical equation_ and the _validation_.
 
 For `EApp`, we have to isolate the $tv$ in the returned $t1$, and composes all of substitutions to make sure all of free variables are properly unified. The logic can be seen as:
 
@@ -296,40 +299,40 @@ $$
 
 If $\tau_1 = \text{t2}$, and $\alpha = \text{tv}$, we get the $\tau_2 = \alpha$ after applying the substitutions.
 
-Now for the `ELet` expression, we will need to write a type inference function for the patterns/parameters:
+Now for the `Expression.Let` expression, we will need to write a type inference function for the patterns/parameters:
 
 ```kotlin
-fun tiPat(pat: Pat, env: Env): Pair<Typ, Env> {
-  return when (pat) {
-    is PVar -> {
-      val typ = fresh()
+fun tiPattern(pattern: Pattern, environment: Environment): Pair<Type, Environment> {
+  return when (pattern) {
+    is Pattern.Variable -> {
+      val type = fresh()
 
-      typ to env.extendEnv(pat.id.name to Forall(emptySet(), typ))
+      type to environment.extend(pattern.id.name to Forall(emptySet(), type))
     }
   }
 }
 ```
 
-This function is quite different, because it returns a pair of `(Typ, Env)`, the first one is going to be the type of the necessary to match the parameter or a subject in case of a match expression, and the second element is going to be the environment when successfully match the requisites.
+This function is quite different, because it returns a pair of `(Type, Environment)`, the first one is going to be the type of the necessary to match the parameter or a subject in case of a match expression, and the second element is going to be the environment when successfully match the requisites.
 
-With the `tiPat` function we can start the `tiAlt`, that will be essential for writing the `ELet` expression inference, as the alternatives are the base construct of a _let expression_.
+With the `tiPattern` function we can start the `tiAlternative`, that will be essential for writing the `ELet` expression inference, as the alternatives are the base construct of a _let expression_.
 
 ```kotlin
-fun tiAlt(alt: Alt, env: Env): Pair<Subst, Typ> {
-  val parameters = mutableListOf<Typ>()
+fun tiAlternative(alternative: Alternative, env: Environment): Pair<Substitution, Type> {
+  val parameters = mutableListOf<Type>()
   val newEnv = env.toMutableMap() // This can be read as the function environment
 
   // We can use a fold function to maintain this pure, but it would decrease the function's readability
-  // This basically will infer the patterns match in the parameters using the `tiPat`
-  for (pat in alt.patterns) {
-    val (typ, currentEnv) = tiPat(pat, newEnv)
+  // This basically will infer the patterns match in the parameters using the `tiPattern`
+  for (pattern in alt.patterns) {
+    val (type, currentEnv) = tiPattern(pattern, newEnv)
 
     parameters += typ
     newEnv += currentEnv
   }
 
   // Now we have to match the "function" body with the "function's environment"
-  val (subst, typ) = tiExp(alt.exp, newEnv)
+  val (subst, type) = tiExpression(alt.exp, newEnv)
 
   // Folding the [parameters] list will create the required type of a binding.
   return subst to parameters.fold(typ) { acc, next ->
@@ -346,27 +349,27 @@ var newEnv = env.toMap()
 
 // Again, we can use a pure function like `fold`, but would be harder to read as we are using Kotlin
 for (alt in exp.bindings.values) {
-  val (subst, typ) = tiAlt(alt, newEnv)
+  val (subst, type) = tiAlternative(alt, newEnv)
 
   newSubst = newSubst compose subst
 
   // The logic is quite the same, but we need to generalize, to create type schemes, because they are going to be read in `EVar` expression.
-  newEnv = newEnv.extendEnv(alt.id.name to generalize(typ, newEnv))
+  newEnv = newEnv.extend(alt.id.name to generalize(typ, newEnv))
 }
 
-val (subst, typ) = tiExp(exp.value, newEnv)
+val (subst, type) = tiExpression(exp.value, newEnv)
 
 // Finally we can compose the substitutions and return the type.
-(subst compose newSubst) to typ
+(subst compose newSubst) to type
 ```
 
 With those concepts of writing the _let expression_ and the _application expression_, we can write the _lambda/abstraction expression_, that is our `EAbs`:
 
 ```kotlin
-val (tv, newEnv) = tiPat(exp.param, env)
-val (subst, typ) = tiExp(exp.value, newEnv)
+val (tv, newEnv) = tiPattern(exp.param, env)
+val (subst, typ) = tiExpression(exp.value, newEnv)
 
 subst to ((tv arrow typ) apply subst)
 ```
 
-This is quite similar to the `tiAlt`, because is the same logic, but with a single parameter.
+This is quite similar to the `tiAlternative`, because is the same logic, but with a single parameter.

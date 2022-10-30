@@ -1,18 +1,18 @@
 package ekko.typing
 
-data class Forall(val names: Set<String>, val typ: Typ) {
-  constructor(vararg names: String, builder: () -> Typ) : this(names.toSet(), builder())
+data class Forall(val names: Set<String>, val type: Type) {
+  constructor(vararg names: String, builder: () -> Type) : this(names.toSet(), builder())
 
   override fun toString(): String = when {
-    names.isEmpty() -> "$typ"
-    else -> "∀ ${names.joinToString(" ") { "'$it" }}. $typ"
+    names.isEmpty() -> "$type"
+    else -> "∀ ${names.joinToString(" ") { "'$it" }}. $type"
   }
 }
 
-fun Forall.apply(subst: Subst): Forall {
-  return Forall(names, typ.apply(subst))
+fun Forall.apply(subst: Substitution): Forall {
+  return Forall(names, type.apply(subst))
 }
 
 fun Forall.ftv(): Set<String> {
-  return typ.ftv().filter { it !in names }.toSet()
+  return type.ftv().filter { it !in names }.toSet()
 }

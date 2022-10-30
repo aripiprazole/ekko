@@ -1,8 +1,8 @@
 package ekko.parsing.tree
 
-sealed interface Pat
-
-data class PVar(val id: Ident, val location: Location = id.location) : Pat
+sealed interface Pattern {
+  data class Variable(val id: Ident, val location: Location = id.location) : Pattern
+}
 
 // data class PAs(val id: Ident, val pat: Pat) : Pat
 //
