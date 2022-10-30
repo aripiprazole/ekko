@@ -17,7 +17,6 @@ GT: '>';
 LT: '<';
 
 // symbols
-TURNED_A: '∀';
 AT: '@';
 AMPERSAND: '&';
 CIRCUMFLEX: '^';
@@ -30,7 +29,7 @@ TIMES: '*';
 DIV: '/';
 DOT: '.';
 
-FORALL: TURNED_A | 'forall';
+FORALL: '∀' | 'forall';
 
 IDENT: ['a-zA-Z_]['a-zA-Z0-9_]*;
 STRING: '"' (~["\r\n\\] | '\\' ~[\r\n])* '"';
@@ -38,7 +37,7 @@ INT: [0-9]+ ;
 DECIMAL: INT '.' INT;
 
 // This is not a lexer rule, but a parser rule, to avoid precedence problems.
-symbol: ARROW | SUM | SUB | TIMES | DIV | EQ | GT | LT | TURNED_A | INTERROGATION | AT | CIRCUMFLEX | EXCLAMATION | SIGN;
+symbol: ARROW | SUM | SUB | TIMES | DIV | EQ | GT | LT | INTERROGATION | AT | CIRCUMFLEX | EXCLAMATION | SIGN;
 symbolIdent: symbol | symbol symbolIdent;
 
 ident: IDENT | LPAREN symbolIdent RPAREN;
