@@ -17,7 +17,7 @@ import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.DiagnosticErrorListener
 
 fun main() {
-  val exp = readExp("let x: int = 10 in x")
+  val exp = readExp("let x: a -> a = 10 in x")
 
   val env = buildMap {
     put("sum", Forall { Type.Int arrow (Type.Int arrow Type.Int) })

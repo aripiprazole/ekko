@@ -37,7 +37,7 @@ INT: [0-9]+ ;
 DECIMAL: INT '.' INT;
 
 // This is not a lexer rule, but a parser rule, to avoid precedence problems.
-symbol: SUM | SUB | TIMES | DIV | EQ | GT | LT | TURNED_A | INTERROGATION | AT | CIRCUMFLEX | EXCLAMATION | SIGN;
+symbol: ARROW | SUM | SUB | TIMES | DIV | EQ | GT | LT | TURNED_A | INTERROGATION | AT | CIRCUMFLEX | EXCLAMATION | SIGN;
 symbolIdent: symbol | symbol symbolIdent;
 
 ident: IDENT | LPAREN symbolIdent RPAREN;
