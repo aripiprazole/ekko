@@ -28,6 +28,7 @@ SUM: '+';
 SUB: '-';
 TIMES: '*';
 DIV: '/';
+DOT: '.';
 
 FORALL: TURNED_A | 'forall';
 
@@ -45,12 +46,15 @@ infixIdent: IDENT | symbolIdent;
 
 pat: name=ident # PVar;
 
-alt: name=ident pat* EQ value=exp # AInfer
-   | name=ident COLON type=typ EQ value=exp # ATyped;
+alt: name=ident pat* EQ value=exp              # AInfer
+   | name=ident COLON type=forall EQ value=exp # ATyped;
 
 typ: name=ident                        # TVar
    | lhs=typ callee=infixIdent rhs=typ # TInfix
    | lhs=typ rhs=typ                   # TApp;
+   
+forall: FORALL ident+ DOT type=typ # SQuantifier
+      | value=typ                  # SType;
 
 exp: LET alt (COMMA alt)* IN value=exp            # ELet
    | BAR param=pat ARROW value=exp                # EAbs

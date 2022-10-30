@@ -18,7 +18,7 @@ fun AltContext.treeToAlternative(file: File): Alternative {
 
     is ATypedContext -> {
       val name = name.treeToIdent(file)
-      val type = type.treeToType(file)
+      val type = type.treeToForall(file)
       val value = value.treeToExp(file)
 
       return Alternative(name, emptyList(), value, getLocationIn(file), type)
