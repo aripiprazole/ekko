@@ -52,7 +52,7 @@ class Typer {
           val (s, typ) = tiAlternative(alternative, newEnvironment)
 
           newSubstitution = newSubstitution compose s
-          newEnvironment = newEnvironment.extendEnv(
+          newEnvironment = newEnvironment.extend(
             alternative.id.name to generalize(typ, newEnvironment),
           )
         }
@@ -87,7 +87,7 @@ class Typer {
       is Pattern.Variable -> {
         val type = fresh()
 
-        type to environment.extendEnv(pattern.id.name to Forall(emptySet(), type))
+        type to environment.extend(pattern.id.name to Forall(emptySet(), type))
       }
     }
   }
