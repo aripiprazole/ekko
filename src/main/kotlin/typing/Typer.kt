@@ -39,43 +39,45 @@ class Typer {
 
       is Expression.Abstraction -> {
         val (tv, newEnv) = tiPattern(expression.parameter, environment)
-        val (subst, typ) = tiExpression(expression.value, newEnv)
+        val (s, type) = tiExpression(expression.value, newEnv)
 
-        subst to ((tv arrow typ) apply subst)
+        s to ((tv arrow type) apply s)
       }
 
       is Expression.Let -> {
-        var newSubst = emptySubstitution()
-        var newEnv = environment.toMap()
+        var newSubstitution = emptySubstitution()
+        var newEnvironment = environment.toMap()
 
-        for (alt in expression.bindings.values) {
-          val (subst, typ) = tiAlternative(alt, newEnv)
+        for (alternative in expression.bindings.values) {
+          val (s, typ) = tiAlternative(alternative, newEnvironment)
 
-          newSubst = newSubst compose subst
-          newEnv = newEnv.extendEnv(alt.id.name to generalize(typ, newEnv))
+          newSubstitution = newSubstitution compose s
+          newEnvironment = newEnvironment.extendEnv(
+            alternative.id.name to generalize(typ, newEnvironment),
+          )
         }
 
-        val (subst, typ) = tiExpression(expression.value, newEnv)
+        val (s, type) = tiExpression(expression.value, newEnvironment)
 
-        (subst compose newSubst) to typ
+        (s compose newSubstitution) to type
       }
     }
   }
 
   fun tiAlternative(alternative: Alternative, environment: Environment): Pair<Substitution, Type> {
     val parameters = mutableListOf<Type>()
-    val newEnv = environment.toMutableMap()
+    val newEnvironment = environment.toMutableMap()
 
-    for (pat in alternative.patterns) {
-      val (typ, currentEnv) = tiPattern(pat, newEnv)
+    for (pattern in alternative.patterns) {
+      val (type, currentEnvironment) = tiPattern(pattern, newEnvironment)
 
-      parameters += typ
-      newEnv += currentEnv
+      parameters += type
+      newEnvironment += currentEnvironment
     }
 
-    val (subst, typ) = tiExpression(alternative.expression, newEnv)
+    val (s, type) = tiExpression(alternative.expression, newEnvironment)
 
-    return subst to parameters.fold(typ) { acc, next ->
+    return s to parameters.fold(type) { acc, next ->
       next arrow acc
     }
   }
@@ -83,9 +85,9 @@ class Typer {
   fun tiPattern(pattern: Pattern, environment: Environment): Pair<Type, Environment> {
     return when (pattern) {
       is Pattern.Variable -> {
-        val typ = fresh()
+        val type = fresh()
 
-        typ to environment.extendEnv(pattern.id.name to Forall(emptySet(), typ))
+        type to environment.extendEnv(pattern.id.name to Forall(emptySet(), type))
       }
     }
   }
