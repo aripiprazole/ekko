@@ -14,18 +14,18 @@ import ekko.parsing.tree.Expression
 import ekko.parsing.tree.Literal
 import java.io.File
 
-fun ExpContext.treeToExp(file: File): Expression {
+fun ExpContext.treeToExpression(file: File): Expression {
   return when (this) {
     is ELetContext -> {
       val names = alt().map { it.treeToAlternative(file) }.associateBy { it.id }
-      val value = value.treeToExp(file)
+      val value = value.treeToExpression(file)
 
       Expression.Let(names, value, getLocationIn(file))
     }
 
     is EAppContext -> {
-      val lhs = lhs.treeToExp(file)
-      val rhs = rhs.treeToExp(file)
+      val lhs = lhs.treeToExpression(file)
+      val rhs = rhs.treeToExpression(file)
 
       Expression.Application(lhs, rhs, getLocationIn(file))
     }
@@ -37,7 +37,7 @@ fun ExpContext.treeToExp(file: File): Expression {
     }
 
     is EGroupContext -> {
-      val value = value.treeToExp(file)
+      val value = value.treeToExpression(file)
 
       Expression.Group(value, getLocationIn(file))
     }
@@ -64,15 +64,15 @@ fun ExpContext.treeToExp(file: File): Expression {
 
     is EAbsContext -> {
       val param = param.treeToPattern(file)
-      val value = value.treeToExp(file)
+      val value = value.treeToExpression(file)
 
       Expression.Abstraction(param, value, getLocationIn(file))
     }
 
     is EInfixContext -> {
       val callee = callee.treeToIdent(file)
-      val lhs = lhs.treeToExp(file)
-      val rhs = rhs.treeToExp(file)
+      val lhs = lhs.treeToExpression(file)
+      val rhs = rhs.treeToExpression(file)
 
       Expression.Application(
         lhs = Expression.Application(

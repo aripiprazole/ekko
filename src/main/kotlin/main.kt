@@ -4,7 +4,7 @@ import ekko.parsing.EkkoLexer
 import ekko.parsing.EkkoParser
 import ekko.parsing.errors.SyntaxErrorListener
 import ekko.parsing.tree.Expression
-import ekko.parsing.treeToExp
+import ekko.parsing.treeToExpression
 import ekko.reporting.Report
 import ekko.typing.Forall
 import ekko.typing.Type
@@ -46,5 +46,5 @@ fun readExp(input: String): Expression {
     error("Can't proceed due to syntax errors")
   }
 
-  return tree.treeToExp(file)
+  return tree.treeToExpression(file)
 }

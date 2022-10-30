@@ -11,7 +11,7 @@ fun AltContext.treeToAlternative(file: File): Alternative {
     is AInferContext -> {
       val name = name.treeToIdent(file)
       val pattern = pat().map { it.treeToPattern(file) }
-      val value = value.treeToExp(file)
+      val value = value.treeToExpression(file)
 
       return Alternative(name, pattern, value, getLocationIn(file))
     }
@@ -19,7 +19,7 @@ fun AltContext.treeToAlternative(file: File): Alternative {
     is ATypedContext -> {
       val name = name.treeToIdent(file)
       val type = type.treeToForall(file)
-      val value = value.treeToExp(file)
+      val value = value.treeToExpression(file)
 
       return Alternative(name, emptyList(), value, getLocationIn(file), type)
     }
