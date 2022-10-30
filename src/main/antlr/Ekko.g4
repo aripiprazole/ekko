@@ -6,11 +6,6 @@ WS: (' ' | '\t' | NEWLINE)+ -> channel(HIDDEN);
 LET: 'let';
 IN: 'in';
 
-// The order that the rules are listed in the grammar is important.
-// if it is not listed in the order of precedence, the parser will
-// not work correctly.
-SYMBOL: SUM | SUB | TIMES | DIV | EQ | GT | LT | TURNED_A | INTERROGATION | AT | CIRCUMFLEX | EXCLAMATION | SIGN;
-
 LPAREN: '(';
 RPAREN: ')';
 EQ: '=';
@@ -41,7 +36,9 @@ STRING: '"' (~["\r\n\\] | '\\' ~[\r\n])* '"';
 INT: [0-9]+ ;
 DECIMAL: INT '.' INT;
 
-symbolIdent: SYMBOL | SYMBOL symbolIdent;
+// This is not a lexer rule, but a parser rule, to avoid precedence problems.
+symbol: SUM | SUB | TIMES | DIV | EQ | GT | LT | TURNED_A | INTERROGATION | AT | CIRCUMFLEX | EXCLAMATION | SIGN;
+symbolIdent: symbol | symbol symbolIdent;
 
 ident: IDENT | LPAREN symbolIdent RPAREN;
 infixIdent: IDENT | symbolIdent;
