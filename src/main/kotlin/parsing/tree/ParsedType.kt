@@ -1,13 +1,15 @@
 package ekko.parsing.tree
 
-sealed class ParsedType {
-  data class Variable(val name: Ident) : ParsedType()
+sealed interface ParsedType {
+  val location: Location
 
-  data class Group(val value: ParsedType, val location: Location) : ParsedType()
+  data class Variable(val name: Ident, override val location: Location = name.location) : ParsedType
+
+  data class Group(val value: ParsedType, override val location: Location) : ParsedType
 
   data class Application(
     val lhs: ParsedType,
     val rhs: ParsedType,
-    val location: Location,
-  ) : ParsedType()
+    override val location: Location,
+  ) : ParsedType
 }

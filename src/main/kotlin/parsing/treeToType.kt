@@ -32,7 +32,7 @@ fun TypContext.treeToType(file: File): ParsedType {
         lhs = ParsedType.Application(
           lhs = ParsedType.Variable(callee),
           rhs = lhs,
-          location = getLocationIn(file),
+          location = lhs.location.endIn(callee.location),
         ),
         rhs = rhs,
         location = getLocationIn(file),

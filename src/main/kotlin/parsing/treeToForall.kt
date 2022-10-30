@@ -12,13 +12,13 @@ fun ForallContext.treeToForall(file: File): ParsedForall {
       val names = ident().map { it.treeToIdent(file) }.toSet()
       val type = type.treeToType(file)
 
-      return ParsedForall(names, type)
+      return ParsedForall(names, type, getLocationIn(file))
     }
 
     is STypeContext -> {
       val type = value.treeToType(file)
 
-      return ParsedForall(emptySet(), type)
+      return ParsedForall(emptySet(), type, getLocationIn(file))
     }
 
     else -> throw IllegalArgumentException("Unsupported scheme: ${this::class}")
