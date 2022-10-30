@@ -8,25 +8,26 @@ import ekko.parsing.EkkoParser.TypContext
 import ekko.parsing.tree.ParsedType
 import java.io.File
 
-fun TypContext.treeToType(file: File): ParsedType {
+context(File)
+fun TypContext.treeToType(): ParsedType {
   when (this) {
     is TVarContext -> {
-      val name = name.treeToIdent(file)
+      val name = name.treeToIdent()
 
       return ParsedType.Variable(name)
     }
 
     is TAppContext -> {
-      val lhs = lhs.treeToType(file)
-      val rhs = rhs.treeToType(file)
+      val lhs = lhs.treeToType()
+      val rhs = rhs.treeToType()
 
-      return ParsedType.Application(lhs, rhs, getLocationIn(file))
+      return ParsedType.Application(lhs, rhs, getLocationIn())
     }
 
     is TInfixContext -> {
-      val lhs = lhs.treeToType(file)
-      val callee = callee.treeToIdent(file)
-      val rhs = rhs.treeToType(file)
+      val lhs = lhs.treeToType()
+      val callee = callee.treeToIdent()
+      val rhs = rhs.treeToType()
 
       return ParsedType.Application(
         lhs = ParsedType.Application(
@@ -35,14 +36,14 @@ fun TypContext.treeToType(file: File): ParsedType {
           location = lhs.location.endIn(callee.location),
         ),
         rhs = rhs,
-        location = getLocationIn(file),
+        location = getLocationIn(),
       )
     }
 
     is TGroupContext -> {
-      val value = value.treeToType(file)
+      val value = value.treeToType()
 
-      return ParsedType.Group(value, getLocationIn(file))
+      return ParsedType.Group(value, getLocationIn())
     }
 
     else -> throw IllegalArgumentException("Unsupported type: ${this::class}")

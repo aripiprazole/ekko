@@ -6,19 +6,20 @@ import ekko.parsing.EkkoParser.STypeContext
 import ekko.parsing.tree.ParsedForall
 import java.io.File
 
-fun ForallContext.treeToForall(file: File): ParsedForall {
+context(File)
+fun ForallContext.treeToForall(): ParsedForall {
   when (this) {
     is SQuantifierContext -> {
-      val names = ident().map { it.treeToIdent(file) }.toSet()
-      val type = type.treeToType(file)
+      val names = ident().map { it.treeToIdent() }.toSet()
+      val type = type.treeToType()
 
-      return ParsedForall(names, type, getLocationIn(file))
+      return ParsedForall(names, type, getLocationIn())
     }
 
     is STypeContext -> {
-      val type = value.treeToType(file)
+      val type = value.treeToType()
 
-      return ParsedForall(emptySet(), type, getLocationIn(file))
+      return ParsedForall(emptySet(), type, getLocationIn())
     }
 
     else -> throw IllegalArgumentException("Unsupported scheme: ${this::class}")

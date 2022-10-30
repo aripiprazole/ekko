@@ -5,12 +5,13 @@ import ekko.parsing.EkkoParser.PatContext
 import ekko.parsing.tree.Pattern
 import java.io.File
 
-fun PatContext.treeToPattern(file: File): Pattern {
+context(File)
+fun PatContext.treeToPattern(): Pattern {
   return when (this) {
     is PVarContext -> {
-      val name = name.treeToIdent(file)
+      val name = name.treeToIdent()
 
-      Pattern.Variable(name, getLocationIn(file))
+      Pattern.Variable(name, getLocationIn())
     }
 
     else -> throw IllegalArgumentException("Unsupported pattern: ${this::class}")
