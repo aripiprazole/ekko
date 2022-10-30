@@ -4,6 +4,11 @@ import ekko.parsing.tree.Alternative
 import ekko.parsing.tree.Expression
 import ekko.parsing.tree.Literal
 import ekko.parsing.tree.Pattern
+import ekko.typing.tree.Forall
+import ekko.typing.tree.Type
+import ekko.typing.tree.apply
+import ekko.typing.tree.arrow
+import ekko.typing.tree.ftv
 
 class Typer {
   private var state: Int = 0

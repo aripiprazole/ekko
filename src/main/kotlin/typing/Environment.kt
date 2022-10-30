@@ -1,5 +1,9 @@
 package ekko.typing
 
+import ekko.typing.tree.Forall
+import ekko.typing.tree.apply
+import ekko.typing.tree.ftv
+
 typealias Environment = Map<String, Forall>
 
 fun emptyEnvironment(): Environment = emptyMap()

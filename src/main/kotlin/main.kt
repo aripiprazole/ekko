@@ -6,10 +6,10 @@ import ekko.parsing.errors.SyntaxErrorListener
 import ekko.parsing.tree.Expression
 import ekko.parsing.treeToExpression
 import ekko.reporting.Report
-import ekko.typing.Forall
-import ekko.typing.Type
 import ekko.typing.Typer
-import ekko.typing.arrow
+import ekko.typing.tree.Forall
+import ekko.typing.tree.Type
+import ekko.typing.tree.arrow
 import kotlin.io.path.createTempFile
 import kotlin.io.path.writeText
 import org.antlr.v4.runtime.CharStreams

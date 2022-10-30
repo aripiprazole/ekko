@@ -1,4 +1,6 @@
-package ekko.typing
+package ekko.typing.tree
+
+import ekko.typing.Substitution
 
 sealed interface Type {
   companion object {

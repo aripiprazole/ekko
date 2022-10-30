@@ -1,4 +1,6 @@
-package ekko.typing
+package ekko.typing.tree
+
+import ekko.typing.Substitution
 
 data class Forall(val names: Set<String>, val type: Type) {
   constructor(vararg names: String, builder: () -> Type) : this(names.toSet(), builder())

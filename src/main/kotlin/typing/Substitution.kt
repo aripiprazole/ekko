@@ -1,5 +1,8 @@
 package ekko.typing
 
+import ekko.typing.tree.Type
+import ekko.typing.tree.apply
+
 typealias Substitution = Map<String, Type>
 
 fun emptySubstitution(): Substitution = emptyMap()
