@@ -43,8 +43,8 @@ kotlin {
 }
 
 java {
-  targetCompatibility = JavaVersion.VERSION_1_8
-  sourceCompatibility = JavaVersion.VERSION_1_8
+  targetCompatibility = JavaVersion.VERSION_16
+  sourceCompatibility = JavaVersion.VERSION_16
 }
 
 dependencies {
@@ -72,7 +72,7 @@ tasks {
 
   withType<KotlinCompile> {
     dependsOn(generateParserSource)
-    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.jvmTarget = "16"
     kotlinOptions.freeCompilerArgs = listOf("-Xcontext-receivers")
   }
 }
