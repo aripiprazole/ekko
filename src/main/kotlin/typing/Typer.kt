@@ -24,7 +24,7 @@ class Typer {
         val scheme = environment[expression.id.name]
           ?: throw InferException("unbound variable: ${expression.id}")
 
-        emptySubstitution() to inst(scheme)
+        emptySubstitution() to instantiate(scheme)
       }
 
       is Expression.Application -> {
@@ -105,7 +105,7 @@ class Typer {
     return Forall(type.ftv().filter { it !in names }.toSet(), type)
   }
 
-  private fun inst(scheme: Forall): Type {
+  private fun instantiate(scheme: Forall): Type {
     val subst = scheme.names.associateWith { fresh() }
 
     return scheme.type apply subst
