@@ -50,7 +50,8 @@ alt: name=ident pat* EQ value=exp              # AInfer
 
 typ: name=ident                        # TVar
    | lhs=typ callee=infixIdent rhs=typ # TInfix
-   | lhs=typ rhs=typ                   # TApp;
+   | lhs=typ rhs=typ                   # TApp
+   | LPAREN typ RPAREN                 # TGroup;
    
 forall: FORALL ident+ DOT type=typ # SQuantifier
       | value=typ                  # SType;
