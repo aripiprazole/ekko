@@ -8,14 +8,14 @@ import ekko.parsing.tree.Pattern
 class Typer {
   private var state: Int = 0
 
-  fun runInfer(expression: Expression, environment: Environment = emptyEnvironment()): Typ {
+  fun runInfer(expression: Expression, environment: Environment = emptyEnvironment()): Type {
     return tiExpression(expression, environment).second
   }
 
   fun tiExpression(
     expression: Expression,
     environment: Environment = emptyEnvironment(),
-  ): Pair<Substitution, Typ> {
+  ): Pair<Substitution, Type> {
     return when (expression) {
       is Expression.Group -> tiExpression(expression.value, environment)
       is Expression.Literal -> emptySubstitution() to tiLiteral(expression.literal)
@@ -62,8 +62,8 @@ class Typer {
     }
   }
 
-  fun tiAlternative(alternative: Alternative, environment: Environment): Pair<Substitution, Typ> {
-    val parameters = mutableListOf<Typ>()
+  fun tiAlternative(alternative: Alternative, environment: Environment): Pair<Substitution, Type> {
+    val parameters = mutableListOf<Type>()
     val newEnv = environment.toMutableMap()
 
     for (pat in alternative.patterns) {
@@ -80,7 +80,7 @@ class Typer {
     }
   }
 
-  fun tiPattern(pattern: Pattern, environment: Environment): Pair<Typ, Environment> {
+  fun tiPattern(pattern: Pattern, environment: Environment): Pair<Type, Environment> {
     return when (pattern) {
       is Pattern.Variable -> {
         val typ = fresh()
@@ -90,33 +90,33 @@ class Typer {
     }
   }
 
-  fun tiLiteral(literal: Literal): Typ {
+  fun tiLiteral(literal: Literal): Type {
     return when (literal) {
-      is Literal.Int -> Typ.Int
-      is Literal.Float -> Typ.Float
-      is Literal.String -> Typ.String
-      is Literal.Unit -> Typ.Unit
+      is Literal.Int -> Type.Int
+      is Literal.Float -> Type.Float
+      is Literal.String -> Type.String
+      is Literal.Unit -> Type.Unit
     }
   }
 
-  private fun generalize(typ: Typ, environment: Environment): Forall {
+  private fun generalize(type: Type, environment: Environment): Forall {
     val names = environment.ftv()
 
-    return Forall(typ.ftv().filter { it !in names }.toSet(), typ)
+    return Forall(type.ftv().filter { it !in names }.toSet(), type)
   }
 
-  private fun inst(scheme: Forall): Typ {
+  private fun inst(scheme: Forall): Type {
     val subst = scheme.names.associateWith { fresh() }
 
-    return scheme.typ apply subst
+    return scheme.type apply subst
   }
 
-  private fun mgu(lhs: Typ, rhs: Typ): Substitution {
+  private fun mgu(lhs: Type, rhs: Type): Substitution {
     return when {
       lhs == rhs -> emptySubstitution()
-      lhs is VarTyp -> lhs bind rhs
-      rhs is VarTyp -> rhs bind lhs
-      lhs is AppTyp && rhs is AppTyp -> {
+      lhs is VarType -> lhs bind rhs
+      rhs is VarType -> rhs bind lhs
+      lhs is AppType && rhs is AppType -> {
         val s1 = mgu(lhs.lhs, rhs.lhs)
         val s2 = mgu(lhs.rhs apply s1, rhs.rhs apply s1)
 
@@ -127,13 +127,13 @@ class Typer {
     }
   }
 
-  private infix fun VarTyp.bind(other: Typ): Substitution = when {
+  private infix fun VarType.bind(other: Type): Substitution = when {
     this == other -> emptySubstitution()
     id in other.ftv() -> throw InferException("infinite type $id in $other")
     else -> substOf(id to other)
   }
 
-  private fun fresh(): Typ = VarTyp(letters.elementAt(++state))
+  private fun fresh(): Type = VarType(letters.elementAt(++state))
 
   private val letters: Sequence<String> = sequence {
     var prefix = ""
