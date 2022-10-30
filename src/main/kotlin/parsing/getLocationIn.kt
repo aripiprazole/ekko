@@ -5,9 +5,10 @@ import ekko.parsing.tree.Position
 import java.io.File
 import org.antlr.v4.runtime.ParserRuleContext
 
-fun ParserRuleContext.getLocationIn(file: File): Location {
+context(File)
+fun ParserRuleContext.getLocationIn(): Location {
   return Location(
-    start = Position(start.startIndex, file),
-    end = Position(stop.stopIndex, file),
+    start = Position(start.startIndex, this@File),
+    end = Position(stop.stopIndex, this@File),
   )
 }

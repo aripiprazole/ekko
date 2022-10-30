@@ -14,32 +14,33 @@ import ekko.parsing.tree.Expression
 import ekko.parsing.tree.Literal
 import java.io.File
 
-fun ExpContext.treeToExpression(file: File): Expression {
+context(File)
+fun ExpContext.treeToExpression(): Expression {
   return when (this) {
     is ELetContext -> {
-      val names = alt().map { it.treeToAlternative(file) }.associateBy { it.id }
-      val value = value.treeToExpression(file)
+      val names = alt().map { it.treeToAlternative() }.associateBy { it.id }
+      val value = value.treeToExpression()
 
-      Expression.Let(names, value, getLocationIn(file))
+      Expression.Let(names, value, getLocationIn())
     }
 
     is EAppContext -> {
-      val lhs = lhs.treeToExpression(file)
-      val rhs = rhs.treeToExpression(file)
+      val lhs = lhs.treeToExpression()
+      val rhs = rhs.treeToExpression()
 
-      Expression.Application(lhs, rhs, getLocationIn(file))
+      Expression.Application(lhs, rhs, getLocationIn())
     }
 
     is EVarContext -> {
-      val ident = value.treeToIdent(file)
+      val ident = value.treeToIdent()
 
-      Expression.Variable(ident, getLocationIn(file))
+      Expression.Variable(ident, getLocationIn())
     }
 
     is EGroupContext -> {
-      val value = value.treeToExpression(file)
+      val value = value.treeToExpression()
 
-      Expression.Group(value, getLocationIn(file))
+      Expression.Group(value, getLocationIn())
     }
 
     is EStringContext -> {
@@ -47,32 +48,32 @@ fun ExpContext.treeToExpression(file: File): Expression {
       // the end of the string.
       val text = value.text.substring(1, value.text.length - 1)
 
-      Expression.Literal(Literal.String(text, getLocationIn(file)))
+      Expression.Literal(Literal.String(text, getLocationIn()))
     }
 
     is EDecimalContext -> {
       val float = value.text.toFloat()
 
-      Expression.Literal(Literal.Float(float, getLocationIn(file)))
+      Expression.Literal(Literal.Float(float, getLocationIn()))
     }
 
     is EIntContext -> {
       val int = value.text.toInt()
 
-      Expression.Literal(Literal.Int(int, getLocationIn(file)))
+      Expression.Literal(Literal.Int(int, getLocationIn()))
     }
 
     is EAbsContext -> {
-      val param = param.treeToPattern(file)
-      val value = value.treeToExpression(file)
+      val param = param.treeToPattern()
+      val value = value.treeToExpression()
 
-      Expression.Abstraction(param, value, getLocationIn(file))
+      Expression.Abstraction(param, value, getLocationIn())
     }
 
     is EInfixContext -> {
-      val callee = callee.treeToIdent(file)
-      val lhs = lhs.treeToExpression(file)
-      val rhs = rhs.treeToExpression(file)
+      val callee = callee.treeToIdent()
+      val lhs = lhs.treeToExpression()
+      val rhs = rhs.treeToExpression()
 
       Expression.Application(
         lhs = Expression.Application(
@@ -81,7 +82,7 @@ fun ExpContext.treeToExpression(file: File): Expression {
           location = lhs.location.endIn(callee.location),
         ),
         rhs = rhs,
-        location = getLocationIn(file),
+        location = getLocationIn(),
       )
     }
 

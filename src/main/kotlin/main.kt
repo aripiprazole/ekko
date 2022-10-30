@@ -46,5 +46,5 @@ fun readExp(input: String): Expression {
     error("Can't proceed due to syntax errors")
   }
 
-  return tree.treeToExpression(file)
+  return file.run { tree.treeToExpression() }
 }
