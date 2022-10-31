@@ -5,6 +5,9 @@ WS: (' ' | '\t' | NEWLINE)+ -> channel(HIDDEN);
 
 LET: 'let';
 IN: 'in';
+MODULE: 'module';
+
+SEMI: ';';
 
 LPAREN: '(';
 RPAREN: ')';
@@ -65,3 +68,8 @@ exp: LET alt (COMMA alt)* IN value=exp            # ELet
    | lhs=exp callee=infixIdent rhs=exp            # EInfix
    | lhs=exp rhs=exp                              # EApp
    | LPAREN value=exp RPAREN                      # EGroup;
+
+decl: alt NEWLINE;
+
+moduleHeader: MODULE ident SEMI;
+module: MODULE decl* EOF;
