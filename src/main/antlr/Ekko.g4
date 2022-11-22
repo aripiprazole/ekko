@@ -6,6 +6,7 @@ WS: (' ' | '\t' | NEWLINE)+ -> channel(HIDDEN);
 LET: 'let';
 IN: 'in';
 MODULE: 'module';
+IMPORT: 'import';
 
 SEMI: ';';
 
@@ -70,6 +71,7 @@ exp: LET alt (COMMA alt)* IN value=exp            # ELet
    | LPAREN value=exp RPAREN                      # EGroup;
 
 decl: alt NEWLINE;
+use: IMPORT name=ident NEWLINE;
 
 moduleHeader: MODULE ident SEMI;
 module: MODULE decl* EOF;
