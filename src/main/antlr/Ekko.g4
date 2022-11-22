@@ -73,5 +73,5 @@ exp: LET alt (COMMA alt)* IN value=exp            # ELet
 decl: alt NEWLINE;
 use: IMPORT name=ident NEWLINE;
 
-moduleHeader: MODULE ident SEMI;
-module: MODULE decl* EOF;
+moduleHeader: MODULE name=ident SEMI;
+module: header=moduleHeader use* decl* EOF;
