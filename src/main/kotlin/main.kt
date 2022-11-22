@@ -3,13 +3,13 @@ package ekko
 import ekko.parsing.EkkoLexer
 import ekko.parsing.EkkoParser
 import ekko.parsing.errors.SyntaxErrorListener
-import ekko.parsing.tree.Expression
 import ekko.parsing.treeToExpression
 import ekko.reporting.Report
 import ekko.typing.Typer
 import ekko.typing.tree.Forall
 import ekko.typing.tree.Type
 import ekko.typing.tree.arrow
+import java.io.File
 import kotlin.io.path.createTempFile
 import kotlin.io.path.writeText
 import org.antlr.v4.runtime.CharStreams
@@ -17,7 +17,7 @@ import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.DiagnosticErrorListener
 
 fun main() {
-  val exp = readExp("let x: ∀ a. a -> a = 10 in x")
+  val exp = readExp("let x: ∀ a. a -> a = 10 in x", EkkoParser::exp) { treeToExpression() }
 
   val env = buildMap {
     put("sum", Forall { Type.Int arrow (Type.Int arrow Type.Int) })
@@ -26,7 +26,7 @@ fun main() {
   println(Typer().runInfer(exp, env))
 }
 
-fun readExp(input: String): Expression {
+fun <E, O> readExp(input: String, f: EkkoParser.() -> E, g: context(File) E.() -> O): O {
   val path = createTempFile("ekko", ".ekko").apply { writeText(input) }
   val file = path.toFile()
 
@@ -38,7 +38,7 @@ fun readExp(input: String): Expression {
     addErrorListener(DiagnosticErrorListener())
   }
 
-  val tree = parser.exp()
+  val tree = f(parser)
 
   if (report.isNotEmpty()) {
     report.show()
@@ -46,5 +46,5 @@ fun readExp(input: String): Expression {
     error("Can't proceed due to syntax errors")
   }
 
-  return file.run { tree.treeToExpression() }
+  return g(file, tree)
 }
