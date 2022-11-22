@@ -1,14 +1,14 @@
 package ekko
 
+// import ekko.typing.Typer
+// import ekko.typing.tree.Forall
+// import ekko.typing.tree.Type
+// import ekko.typing.tree.arrow
 import ekko.parsing.EkkoLexer
 import ekko.parsing.EkkoParser
 import ekko.parsing.errors.SyntaxErrorListener
-import ekko.parsing.treeToExpression
+import ekko.parsing.treeToModule
 import ekko.reporting.Report
-import ekko.typing.Typer
-import ekko.typing.tree.Forall
-import ekko.typing.tree.Type
-import ekko.typing.tree.arrow
 import java.io.File
 import kotlin.io.path.createTempFile
 import kotlin.io.path.writeText
@@ -17,13 +17,24 @@ import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.DiagnosticErrorListener
 
 fun main() {
-  val exp = readExp("let x: ∀ a. a -> a = 10 in x", EkkoParser::exp) { treeToExpression() }
+  val module = readExp(
+    """
+    module Main;
+    
+    x: Int = 10
+    
+    main: IO = print x
+    """.trimIndent(),
+    EkkoParser::module,
+  ) { treeToModule() }
 
-  val env = buildMap {
-    put("sum", Forall { Type.Int arrow (Type.Int arrow Type.Int) })
-  }
+  println(module)
 
-  println(Typer().runInfer(exp, env))
+//  val env = buildMap {
+//    put("sum", Forall { Type.Int arrow (Type.Int arrow Type.Int) })
+//  }
+
+//  println(Typer().runInfer(exp, env))
 }
 
 fun <E, O> readExp(input: String, f: EkkoParser.() -> E, g: context(File) E.() -> O): O {
