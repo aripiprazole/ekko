@@ -28,7 +28,8 @@ The Abstract Syntax Tree(known briefly as AST) is a tree representation of the S
 of Ekko project is:
 
 Expression in the base of expressions in a programming language, which can be in Ekko's case, from literals(integers,
-decimals, strings, unit) to function calls(known as `Expression.Application`) and lambdas(that will not be implemented at this moment of
+decimals, strings, unit) to function calls(known as `Expression.Application`) and lambdas(that will not be implemented
+at this moment of
 the article).
 
 ```kotlin
