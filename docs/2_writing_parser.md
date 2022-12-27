@@ -2,7 +2,7 @@
 
 Parsing can be hard when trying to write a parser from scratch, even if it is a top-down parser, combinators, etc... So
 this article we are going to use `ANTLR`, that is a full-featured parser generator, that generates for differents
-targets(Java, C#, etc), so you can reutilize the parser in another projects.
+targets(Java, C#, etc), so you can utilize the parser in another projects.
 
 We have no official support for ANTLR in Kotlin, but we can use the Java runtime, so we can use the generated parser by
 the Java's gradle plugin. The plugin classpath is builtin in the gradle dependency manager.
@@ -275,7 +275,7 @@ println(parser.exp().toParseTree().multilineString())
 The generated code from the parser will never replace our AST, cause its dirty and uncontrolled/not versioned by git.
 So we need to map the tree to the AST.
 
-We can start making utilitary functions like:
+We can start making utility functions like:
 
 ```kotlin
 // parserUtils.kt
@@ -352,7 +352,7 @@ fun ExpContext.treeToExpression(): Expression {
   return when (this) {
     is ELetContext -> {
       val names = alt().map { it.treeToAlternative() }.associateBy { it.id }
-      val value = value.treeToExp()
+      val value = value.treeToExpression()
 
       Expression.Let(names, value, currentLocation())
     }

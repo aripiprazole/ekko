@@ -137,7 +137,7 @@ can be implemented in `Kotlin` in:
 // Unify.kt
 fun mgu(lhs: Type, rhs: Type): Substitution {
   return when {
-    lhs == rhs -> emptySubst()
+    lhs == rhs -> emptySubstitution()
     lhs is Type.Variable -> lhs bind rhs
     rhs is Type.Variable -> rhs bind lhs
     lhs is Type.Application && rhs is Type.Application -> {
@@ -171,7 +171,7 @@ And can be implemented in kotlin as:
 
 ```kotlin
 infix fun Forall.apply(subst: Substitution): Forall {
-  return Forall(names, type.apply(subst))
+  return Forall(names, type apply subst)
 }
 
 infix fun Type.apply(subst: Substitution): Typ {
@@ -255,17 +255,17 @@ write the environment class:
 // Env.kt
 typealias Environment = Map<String, Forall>
 
-fun emptyEnvironment(): Env = emptyMap()
+fun emptyEnvironment(): Environment = emptyMap()
 
-fun environmentOf(vararg pairs: Pair<String, Forall>): Env = mapOf(pairs = pairs)
+fun environmentOf(vararg pairs: Pair<String, Forall>): Environment = mapOf(pairs = pairs)
 
 fun Environment.ftv(): Set<String> = values.flatMap { it.ftv() }.toSet()
 
-fun Environment.extendEnv(vararg pairs: Pair<String, Forall>): Environment {
+fun Environment.extend(vararg pairs: Pair<String, Forall>): Environment {
   return this + environmentOf(pairs = pairs)
 }
 
-fun Environment.apply(subst: Substitution): Env {
+fun Environment.apply(subst: Substitution): Environment {
   return mapValues { it.value.apply(subst) }
 }
 ```
@@ -273,11 +273,11 @@ fun Environment.apply(subst: Substitution): Env {
 We use a type alias, to be easier to iterate without re-implementing all of them.
 
 ```kotlin
-fun tiExpression(expression: Exp, environment: Env = emptyEnv()): Pair<Subst, Typ> {
+fun tiExpression(expression: Expression, environment: Environment = emptyEnvironment()): Pair<Subst, Typ> {
   return when (expression) {
     is Expression.Group -> tiExpression(expression.value)
 
-    is Expression.Lit -> emptySubstitution() to tiLiteral(expression.lit)
+    is Expression.Literal -> emptySubstitution() to tiLiteral(expression.lit)
 
     is Expression.Variable -> {
       val scheme = environment[expression.id.name]
@@ -348,21 +348,21 @@ With the `tiPattern` function we can start the `tiAlternative`, that will be ess
 inference, as the alternatives are the base construct of a _let expression_.
 
 ```kotlin
-fun tiAlternative(alternative: Alternative, env: Environment): Pair<Substitution, Type> {
+fun tiAlternative(alternative: Alternative, environment: Environment): Pair<Substitution, Type> {
   val parameters = mutableListOf<Type>()
-  val newEnv = env.toMutableMap() // This can be read as the function environment
+  val newEnvironment = environment.toMutableMap() // This can be read as the function environment
 
   // We can use a fold function to maintain this pure, but it would decrease the function's readability
   // This basically will infer the patterns match in the parameters using the `tiPattern`
   for (pattern in alt.patterns) {
-    val (type, currentEnv) = tiPattern(pattern, newEnv)
+    val (type, currentEnv) = tiPattern(pattern, newEnvironment)
 
     parameters += typ
-    newEnv += currentEnv
+    newEnvironment += currentEnv
   }
 
   // Now we have to match the "function" body with the "function's environment"
-  val (subst, type) = tiExpression(alt.exp, newEnv)
+  val (subst, type) = tiExpression(alt.exp, newEnvironment)
 
   // Folding the [parameters] list will create the required type of a binding.
   return subst to parameters.fold(typ) { acc, next ->
@@ -374,31 +374,31 @@ fun tiAlternative(alternative: Alternative, env: Environment): Pair<Substitution
 Now, with both of the functions wrote, we can type the inference for the `ELet` expression:
 
 ```kotlin
-var newSubst = emptySubst()
-var newEnv = env.toMap()
+var newSubstitution = emptySubstitution()
+var newEnvironment = env.toMap()
 
 // Again, we can use a pure function like `fold`, but would be harder to read as we are using Kotlin
 for (alt in exp.bindings.values) {
-  val (subst, type) = tiAlternative(alt, newEnv)
+  val (subst, type) = tiAlternative(alt, newEnvironment)
 
-  newSubst = newSubst compose subst
+  newSubstitution = newSubstitution compose subst
 
   // The logic is quite the same, but we need to generalize, to create type schemes, because they are going to be read in `EVar` expression.
-  newEnv = newEnv.extend(alt.id.name to generalize(typ, newEnv))
+  newEnvironment = newEnvironment.extend(alt.id.name to generalize(type, newEnvironment))
 }
 
-val (subst, type) = tiExpression(exp.value, newEnv)
+val (subst, type) = tiExpression(exp.value, newEnvironment)
 
 // Finally we can compose the substitutions and return the type.
-(subst compose newSubst) to type
+(subst compose newSubstitution) to type
 ```
 
 With those concepts of writing the _let expression_ and the _application expression_, we can write the
 _lambda/abstraction expression_, that is our `EAbs`:
 
 ```kotlin
-val (tv, newEnv) = tiPattern(exp.param, env)
-val (subst, typ) = tiExpression(exp.value, newEnv)
+val (tv, newEnvironment) = tiPattern(exp.param, env)
+val (subst, typ) = tiExpression(exp.value, newEnvironment)
 
 subst to ((tv arrow typ) apply subst)
 ```
